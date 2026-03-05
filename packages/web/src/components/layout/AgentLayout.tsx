@@ -12,11 +12,24 @@ export function AgentLayout() {
 
   return (
     <div className="min-h-screen bg-surface-alt">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium focus:shadow-md"
+      >
+        Skip to main content
+      </a>
+
       {/* Mobile overlay */}
       {isMobile && !sidebarCollapsed && (
         <div
           className="fixed inset-0 z-20 bg-black/50"
           onClick={toggleSidebar}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              toggleSidebar();
+            }
+          }}
           aria-hidden="true"
         />
       )}
@@ -28,7 +41,7 @@ export function AgentLayout() {
           'transition-transform duration-200',
         )}
       >
-        <Sidebar />
+        <Sidebar isMobileOpen={isMobile && !sidebarCollapsed} onClose={toggleSidebar} />
       </div>
 
       {/* Main content */}
@@ -39,7 +52,7 @@ export function AgentLayout() {
         )}
       >
         <TopBar />
-        <main className="p-4 lg:p-6" role="main">
+        <main id="main-content" className="p-4 lg:p-6" role="main">
           <Outlet />
         </main>
       </div>

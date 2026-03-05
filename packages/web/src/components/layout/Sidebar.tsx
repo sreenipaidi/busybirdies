@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router';
 import { cn } from '../../lib/cn.js';
 import { useAuthStore } from '../../stores/auth.store.js';
 import { useUIStore } from '../../stores/ui.store.js';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import { Avatar } from '../ui/Avatar.js';
 
 interface NavItem {
@@ -9,6 +10,13 @@ interface NavItem {
   path: string;
   icon: React.ReactNode;
   adminOnly?: boolean;
+}
+
+export interface SidebarProps {
+  /** Whether the sidebar is open on mobile (for focus trapping) */
+  isMobileOpen?: boolean;
+  /** Callback to close the sidebar (used by focus trap Escape) */
+  onClose?: () => void;
 }
 
 const mainNavItems: NavItem[] = [
@@ -95,14 +103,16 @@ const adminNavItems: NavItem[] = [
   },
 ];
 
-export function Sidebar() {
+export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps = {}) {
   const user = useAuthStore((s) => s.user);
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
   const isAdmin = user?.role === 'admin';
   const location = useLocation();
+  const focusTrapRef = useFocusTrap<HTMLElement>(isMobileOpen, onClose);
 
   return (
     <aside
+      ref={focusTrapRef}
       className={cn(
         'fixed top-0 left-0 z-30 h-full bg-surface border-r border-border',
         'flex flex-col transition-all duration-200',

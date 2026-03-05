@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import {
@@ -6,6 +7,7 @@ import {
 } from '../services/email.service.js';
 import type { SendGridInboundPayload } from '../services/email.service.js';
 import { getLogger } from '../lib/logger.js';
+import { getConfig } from '../config.js';
 
 /**
  * Zod schema for basic validation of the SendGrid Inbound Parse payload.
@@ -24,21 +26,56 @@ const inboundEmailSchema = z.object({
 });
 
 /**
- * Stub for SendGrid webhook signature verification.
- * In production, this should verify the X-Twilio-Email-Event-Webhook-Signature
- * header against the webhook signing key.
+ * Verify the webhook signature sent by SendGrid using HMAC-SHA256.
+ * Uses crypto.timingSafeEqual to prevent timing attacks.
  *
- * TODO: Implement proper signature verification using the SendGrid event webhook
- * verification library or manual ECDSA verification.
+ * The signature is computed as HMAC-SHA256(timestamp + body, secret) and
+ * sent base64-encoded in the X-Twilio-Email-Event-Webhook-Signature header.
+ *
+ * @param signature - The base64-encoded HMAC signature from the request header
+ * @param timestamp - The timestamp from the X-Twilio-Email-Event-Webhook-Timestamp header
+ * @param body - The raw request body string
+ * @returns true if the signature is valid, false otherwise
  */
-function verifyWebhookSignature(
-  _signature: string | undefined,
-  _timestamp: string | undefined,
-  _body: string,
+export function verifyWebhookSignature(
+  signature: string | undefined,
+  timestamp: string | undefined,
+  body: string,
 ): boolean {
   const logger = getLogger();
-  logger.warn('Webhook signature verification is stubbed -- accepting all requests');
-  return true;
+  const config = getConfig();
+
+  const secret = config.SENDGRID_WEBHOOK_SECRET;
+
+  if (!secret) {
+    logger.error('SENDGRID_WEBHOOK_SECRET is not configured -- rejecting webhook request');
+    return false;
+  }
+
+  if (!signature || !timestamp) {
+    logger.warn('Missing webhook signature or timestamp header');
+    return false;
+  }
+
+  try {
+    const payload = timestamp + body;
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(payload)
+      .digest('base64');
+
+    const sigBuffer = Buffer.from(signature, 'base64');
+    const expectedBuffer = Buffer.from(expectedSignature, 'base64');
+
+    if (sigBuffer.length !== expectedBuffer.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(sigBuffer, expectedBuffer);
+  } catch (err) {
+    logger.error({ err }, 'Error verifying webhook signature');
+    return false;
+  }
 }
 
 /**

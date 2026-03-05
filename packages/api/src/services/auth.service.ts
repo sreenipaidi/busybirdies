@@ -66,9 +66,20 @@ export async function login(input: LoginInput): Promise<AuthResult> {
   // Look up tenant
   const tenant = await getTenantBySubdomain(input.portal);
 
-  // Look up user within tenant
+  // Look up user within tenant -- select only the columns needed for login verification
   const [user] = await db
-    .select()
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role,
+      isActive: users.isActive,
+      emailVerified: users.emailVerified,
+      passwordHash: users.passwordHash,
+      failedLoginAttempts: users.failedLoginAttempts,
+      lockedUntil: users.lockedUntil,
+      createdAt: users.createdAt,
+    })
     .from(users)
     .where(and(eq(users.tenantId, tenant.id), eq(users.email, input.email)))
     .limit(1);
@@ -336,7 +347,7 @@ export async function forgotPassword(
 
   // Look up tenant (silently ignore if not found)
   const [tenant] = await db
-    .select()
+    .select({ id: tenants.id })
     .from(tenants)
     .where(eq(tenants.subdomain, input.portal))
     .limit(1);
@@ -348,9 +359,9 @@ export async function forgotPassword(
     };
   }
 
-  // Look up user (silently continue if not found)
+  // Look up user (silently continue if not found) -- only need id for update
   const [user] = await db
-    .select()
+    .select({ id: users.id })
     .from(users)
     .where(and(eq(users.tenantId, tenant.id), eq(users.email, input.email)))
     .limit(1);
@@ -386,9 +397,12 @@ export async function resetPassword(
 ): Promise<{ message: string }> {
   const db = getDb();
 
-  // Find user with the given reset token
+  // Find user with the given reset token -- only select columns needed for reset
   const [user] = await db
-    .select()
+    .select({
+      id: users.id,
+      passwordResetTokenExpires: users.passwordResetTokenExpires,
+    })
     .from(users)
     .where(eq(users.passwordResetToken, input.token))
     .limit(1);
@@ -458,8 +472,17 @@ export async function getCurrentUser(
 }> {
   const db = getDb();
 
+  // Select only non-sensitive user columns
   const [user] = await db
-    .select()
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role,
+      isActive: users.isActive,
+      emailVerified: users.emailVerified,
+      createdAt: users.createdAt,
+    })
     .from(users)
     .where(and(eq(users.id, userId), eq(users.tenantId, tenantId)))
     .limit(1);
@@ -469,7 +492,13 @@ export async function getCurrentUser(
   }
 
   const [tenant] = await db
-    .select()
+    .select({
+      id: tenants.id,
+      name: tenants.name,
+      subdomain: tenants.subdomain,
+      logoUrl: tenants.logoUrl,
+      brandColor: tenants.brandColor,
+    })
     .from(tenants)
     .where(eq(tenants.id, tenantId))
     .limit(1);

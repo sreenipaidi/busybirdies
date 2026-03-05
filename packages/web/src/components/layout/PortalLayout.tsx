@@ -20,6 +20,14 @@ export function PortalLayout() {
 
   return (
     <div className="min-h-screen bg-surface-alt">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-medium focus:shadow-md"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-surface border-b border-border sticky top-0 z-20" role="banner">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -140,7 +148,7 @@ export function PortalLayout() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-5xl mx-auto px-4 py-6" role="main">
+      <main id="main-content" className="max-w-5xl mx-auto px-4 py-6" role="main">
         <Outlet />
       </main>
     </div>

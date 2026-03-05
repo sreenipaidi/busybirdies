@@ -15,7 +15,11 @@ import { reportRoutes } from './routes/reports.routes.js';
 import { csatRoutes } from './routes/csat.routes.js';
 import { collisionRoutes } from './routes/collision.routes.js';
 import { webhookRoutes } from './routes/webhooks.routes.js';
+import { agentGroupRoutes } from './routes/agent-groups.routes.js';
+import { tenantRoutes } from './routes/tenant.routes.js';
 import { registerErrorHandler } from './middleware/error-handler.middleware.js';
+import { registerRequestId } from './middleware/request-id.middleware.js';
+import { registerRateLimit } from './middleware/rate-limit.middleware.js';
 
 export async function buildApp() {
   const config = getConfig();
@@ -42,6 +46,12 @@ export async function buildApp() {
   });
   await app.register(cookie);
 
+  // Register request-id middleware to set X-Request-Id on all responses
+  registerRequestId(app);
+
+  // Register rate limiting middleware
+  await registerRateLimit(app);
+
   // Register global error handler
   registerErrorHandler(app);
 
@@ -57,6 +67,8 @@ export async function buildApp() {
   await app.register(reportRoutes, { prefix: '/v1' });
   await app.register(csatRoutes, { prefix: '/v1' });
   await app.register(collisionRoutes, { prefix: '/v1' });
+  await app.register(agentGroupRoutes, { prefix: '/v1' });
+  await app.register(tenantRoutes, { prefix: '/v1' });
 
   // Webhook routes -- no auth required (secured by webhook signature verification)
   await app.register(webhookRoutes, { prefix: '/v1' });

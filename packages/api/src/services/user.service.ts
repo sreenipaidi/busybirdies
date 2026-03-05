@@ -74,9 +74,17 @@ export async function listUsers(
 
   const total = countResult?.total ?? 0;
 
-  // Get paginated results
+  // Get paginated results -- exclude sensitive columns
   const rows = await db
-    .select()
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role,
+      isActive: users.isActive,
+      emailVerified: users.emailVerified,
+      createdAt: users.createdAt,
+    })
     .from(users)
     .where(whereClause)
     .orderBy(users.createdAt)
@@ -169,8 +177,12 @@ export async function activateUser(
 ): Promise<{ message: string }> {
   const db = getDb();
 
+  // Only select columns needed for activation -- exclude passwordHash and other sensitive fields
   const [user] = await db
-    .select()
+    .select({
+      id: users.id,
+      activationTokenExpires: users.activationTokenExpires,
+    })
     .from(users)
     .where(eq(users.activationToken, input.token))
     .limit(1);
@@ -220,8 +232,17 @@ export async function getUser(
 ): Promise<UserResponse> {
   const db = getDb();
 
+  // Select only non-sensitive columns
   const [user] = await db
-    .select()
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role,
+      isActive: users.isActive,
+      emailVerified: users.emailVerified,
+      createdAt: users.createdAt,
+    })
     .from(users)
     .where(and(eq(users.id, userId), eq(users.tenantId, tenantId)))
     .limit(1);
@@ -255,8 +276,12 @@ export async function updateUser(
 ): Promise<UserResponse> {
   const db = getDb();
 
+  // Select only non-sensitive columns for authorization checks
   const [user] = await db
-    .select()
+    .select({
+      id: users.id,
+      role: users.role,
+    })
     .from(users)
     .where(and(eq(users.id, userId), eq(users.tenantId, tenantId)))
     .limit(1);

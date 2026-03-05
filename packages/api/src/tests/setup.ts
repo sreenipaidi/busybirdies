@@ -9,3 +9,4 @@ process.env.DATABASE_URL = 'postgresql://supportdesk:supportdesk@localhost:5432/
 process.env.REDIS_URL = 'redis://localhost:6379';
 process.env.CORS_ORIGINS = 'http://localhost:5173';
 process.env.LOG_LEVEL = 'silent';
+process.env.SENDGRID_WEBHOOK_SECRET = 'test-webhook-secret-for-unit-tests';

@@ -6,6 +6,7 @@ import {
   NotFoundError,
   ConflictError,
 } from '../lib/errors.js';
+import { sanitizeRichText } from '../lib/sanitize.js';
 import type {
   KBCategory,
   KBArticle,
@@ -550,6 +551,9 @@ export async function createArticle(
 
   const slug = generateSlug(input.title);
 
+  // Sanitize the article body to prevent stored XSS
+  const sanitizedBody = sanitizeRichText(input.body);
+
   const [row] = await db
     .insert(kbArticles)
     .values({
@@ -557,7 +561,7 @@ export async function createArticle(
       categoryId: input.category_id,
       title: input.title,
       slug,
-      body: input.body,
+      body: sanitizedBody,
       status: input.status ?? 'draft',
       authorId,
     })
@@ -616,7 +620,7 @@ export async function updateArticle(
     updateValues.title = input.title;
     updateValues.slug = generateSlug(input.title);
   }
-  if (input.body !== undefined) updateValues.body = input.body;
+  if (input.body !== undefined) updateValues.body = sanitizeRichText(input.body);
   if (input.category_id !== undefined) updateValues.categoryId = input.category_id;
   if (input.status !== undefined) updateValues.status = input.status;
 

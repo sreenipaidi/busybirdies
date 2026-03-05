@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildApp } from '../app.js';
 import type { FastifyInstance } from 'fastify';
@@ -21,6 +22,28 @@ import * as emailService from '../services/email.service.js';
 // Helpers
 // -------------------------------------------------------------------
 
+const WEBHOOK_SECRET = process.env.SENDGRID_WEBHOOK_SECRET ?? 'test-webhook-secret-for-unit-tests';
+
+/**
+ * Generate a valid HMAC-SHA256 webhook signature for the given body.
+ * Returns the signature and timestamp headers.
+ */
+function generateWebhookHeaders(body: string): {
+  'x-twilio-email-event-webhook-signature': string;
+  'x-twilio-email-event-webhook-timestamp': string;
+} {
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const payload = timestamp + body;
+  const signature = crypto
+    .createHmac('sha256', WEBHOOK_SECRET)
+    .update(payload)
+    .digest('base64');
+  return {
+    'x-twilio-email-event-webhook-signature': signature,
+    'x-twilio-email-event-webhook-timestamp': timestamp,
+  };
+}
+
 function validInboundPayload() {
   return {
     from: 'John Doe <john@example.com>',
@@ -32,6 +55,35 @@ function validInboundPayload() {
     envelope: '{}',
     attachments: '0',
   };
+}
+
+/**
+ * Helper to inject a webhook request with valid signature.
+ */
+async function injectWebhook(
+  app: FastifyInstance,
+  payload: Record<string, unknown>,
+  options?: { omitSignature?: boolean; invalidSignature?: boolean },
+) {
+  const body = JSON.stringify(payload);
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+  };
+
+  if (!options?.omitSignature) {
+    const webhookHeaders = generateWebhookHeaders(body);
+    if (options?.invalidSignature) {
+      webhookHeaders['x-twilio-email-event-webhook-signature'] = 'invalid-sig';
+    }
+    Object.assign(headers, webhookHeaders);
+  }
+
+  return app.inject({
+    method: 'POST',
+    url: '/v1/webhooks/inbound-email',
+    payload,
+    headers,
+  });
 }
 
 // -------------------------------------------------------------------
@@ -72,11 +124,7 @@ describe('Webhook routes', () => {
         clientId: 'client-uuid',
       });
 
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: validInboundPayload(),
-      });
+      const response = await injectWebhook(app, validInboundPayload());
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
@@ -105,21 +153,18 @@ describe('Webhook routes', () => {
         clientId: 'client-uuid',
       });
 
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: {
-          ...validInboundPayload(),
-          subject: 'Re: TKT-00042 Cannot login',
-        },
-      });
+      const payload = {
+        ...validInboundPayload(),
+        subject: 'Re: TKT-00042 Cannot login',
+      };
+      const response = await injectWebhook(app, payload);
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.message).toBe('Processed.');
     });
 
-    it('should not require authentication', async () => {
+    it('should not require session cookie authentication (uses webhook signature instead)', async () => {
       vi.mocked(emailService.parseInboundEmail).mockReturnValue({
         from: 'john@example.com',
         fromName: 'John Doe',
@@ -141,28 +186,35 @@ describe('Webhook routes', () => {
         clientId: 'client-uuid',
       });
 
-      // No cookie/auth header -- should still work
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: validInboundPayload(),
-      });
+      // No session cookie -- should still work with valid webhook signature
+      const response = await injectWebhook(app, validInboundPayload());
 
-      // Should NOT be 401
-      expect(response.statusCode).not.toBe(401);
       expect(response.statusCode).toBe(200);
     });
 
+    it('should return 401 when signature is missing', async () => {
+      const response = await injectWebhook(app, validInboundPayload(), { omitSignature: true });
+
+      expect(response.statusCode).toBe(401);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe('UNAUTHORIZED');
+    });
+
+    it('should return 401 when signature is invalid', async () => {
+      const response = await injectWebhook(app, validInboundPayload(), { invalidSignature: true });
+
+      expect(response.statusCode).toBe(401);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe('UNAUTHORIZED');
+    });
+
     it('should return 422 when "from" is missing', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: {
-          to: 'support@acme.helpdesk.com',
-          subject: 'Test',
-          text: 'Test body',
-        },
-      });
+      const payload = {
+        to: 'support@acme.helpdesk.com',
+        subject: 'Test',
+        text: 'Test body',
+      };
+      const response = await injectWebhook(app, payload);
 
       expect(response.statusCode).toBe(422);
       const body = JSON.parse(response.body);
@@ -170,15 +222,12 @@ describe('Webhook routes', () => {
     });
 
     it('should return 422 when "to" is missing', async () => {
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: {
-          from: 'user@example.com',
-          subject: 'Test',
-          text: 'Test body',
-        },
-      });
+      const payload = {
+        from: 'user@example.com',
+        subject: 'Test',
+        text: 'Test body',
+      };
+      const response = await injectWebhook(app, payload);
 
       expect(response.statusCode).toBe(422);
       const body = JSON.parse(response.body);
@@ -203,11 +252,7 @@ describe('Webhook routes', () => {
         new Error('Tenant not found'),
       );
 
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: validInboundPayload(),
-      });
+      const response = await injectWebhook(app, validInboundPayload());
 
       // Returns 200 to prevent SendGrid from retrying
       expect(response.statusCode).toBe(200);
@@ -231,11 +276,7 @@ describe('Webhook routes', () => {
         new Error('Database connection failed'),
       );
 
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: validInboundPayload(),
-      });
+      const response = await injectWebhook(app, validInboundPayload());
 
       expect(response.statusCode).toBe(500);
       const body = JSON.parse(response.body);
@@ -264,14 +305,11 @@ describe('Webhook routes', () => {
         clientId: 'client-uuid',
       });
 
-      const response = await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: {
-          from: 'john@example.com',
-          to: 'support@acme.helpdesk.com',
-        },
-      });
+      const payload = {
+        from: 'john@example.com',
+        to: 'support@acme.helpdesk.com',
+      };
+      const response = await injectWebhook(app, payload);
 
       expect(response.statusCode).toBe(200);
     });
@@ -298,11 +336,7 @@ describe('Webhook routes', () => {
         clientId: 'client-uuid',
       });
 
-      await app.inject({
-        method: 'POST',
-        url: '/v1/webhooks/inbound-email',
-        payload: validInboundPayload(),
-      });
+      await injectWebhook(app, validInboundPayload());
 
       expect(emailService.parseInboundEmail).toHaveBeenCalledTimes(1);
       expect(emailService.processInboundEmail).toHaveBeenCalledTimes(1);

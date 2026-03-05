@@ -10,13 +10,16 @@ const envSchema = z.object({
     .string()
     .default('postgresql://supportdesk:supportdesk@localhost:5432/supportdesk'),
   REDIS_URL: z.string().default('redis://localhost:6379'),
-  JWT_SECRET: z.string().default('change-me-to-a-256-bit-secret-in-production'),
+  JWT_SECRET: z
+    .string()
+    .min(32, 'JWT_SECRET must be at least 32 characters for adequate security'),
   JWT_ISSUER: z.string().default('supportdesk'),
   JWT_EMPLOYEE_EXPIRY: z.string().default('8h'),
   JWT_CLIENT_EXPIRY: z.string().default('24h'),
   LOG_LEVEL: z.string().default('info'),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60000),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
+  SENDGRID_WEBHOOK_SECRET: z.string().optional(),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

@@ -3,6 +3,7 @@ import { getDb } from '../db/connection.js';
 import { tenants, users, tickets, ticketReplies, ticketAuditEntries } from '../db/schema.js';
 import { AppError, NotFoundError } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
+import { sanitizeRichText } from '../lib/sanitize.js';
 import type { UserRole } from '@supportdesk/shared';
 
 // ---------------------------------------------------------------------------
@@ -370,6 +371,26 @@ export async function findOrCreateClient(
 }
 
 // ---------------------------------------------------------------------------
+// HTML Escaping Utility
+// ---------------------------------------------------------------------------
+
+/**
+ * Escape HTML special characters in a string to prevent injection
+ * when embedding user-controlled content in email templates.
+ *
+ * @param str - The untrusted string to escape
+ * @returns The HTML-escaped string safe for embedding in templates
+ */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ---------------------------------------------------------------------------
 // Email Templates
 // ---------------------------------------------------------------------------
 
@@ -382,19 +403,24 @@ export function renderTicketCreatedEmail(params: {
   tenantName: string;
   supportEmail: string;
 }): { subject: string; html: string } {
+  const safeTicketNumber = escapeHtml(params.ticketNumber);
+  const safeSubject = escapeHtml(params.subject);
+  const safeTenantName = escapeHtml(params.tenantName);
+  const safeSupportEmail = escapeHtml(params.supportEmail);
+
   return {
     subject: `[${params.ticketNumber}] ${params.subject} - Ticket Received`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Your request has been received</h2>
         <p>Hi,</p>
-        <p>We have received your support request and created ticket <strong>${params.ticketNumber}</strong>.</p>
-        <p><strong>Subject:</strong> ${params.subject}</p>
+        <p>We have received your support request and created ticket <strong>${safeTicketNumber}</strong>.</p>
+        <p><strong>Subject:</strong> ${safeSubject}</p>
         <p>Our team will review your request and get back to you as soon as possible.</p>
         <p>You can reply to this email to add more information to your ticket.</p>
         <hr />
         <p style="color: #666; font-size: 12px;">
-          ${params.tenantName} Support | ${params.supportEmail}
+          ${safeTenantName} Support | ${safeSupportEmail}
         </p>
       </div>
     `.trim(),
@@ -412,19 +438,26 @@ export function renderAgentReplyEmail(params: {
   tenantName: string;
   supportEmail: string;
 }): { subject: string; html: string } {
+  const safeTicketNumber = escapeHtml(params.ticketNumber);
+  const safeSubject = escapeHtml(params.subject);
+  const safeAgentName = escapeHtml(params.agentName);
+  const safeReplyBody = sanitizeRichText(params.replyBody);
+  const safeTenantName = escapeHtml(params.tenantName);
+  const safeSupportEmail = escapeHtml(params.supportEmail);
+
   return {
     subject: `Re: [${params.ticketNumber}] ${params.subject}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>New reply on your ticket</h2>
-        <p><strong>${params.agentName}</strong> replied to your ticket <strong>${params.ticketNumber}</strong>:</p>
+        <p><strong>${safeAgentName}</strong> replied to your ticket <strong>${safeTicketNumber}</strong> (${safeSubject}):</p>
         <div style="background: #f5f5f5; padding: 16px; border-radius: 4px; margin: 16px 0;">
-          ${params.replyBody}
+          ${safeReplyBody}
         </div>
         <p>You can reply to this email to respond.</p>
         <hr />
         <p style="color: #666; font-size: 12px;">
-          ${params.tenantName} Support | ${params.supportEmail}
+          ${safeTenantName} Support | ${safeSupportEmail}
         </p>
       </div>
     `.trim(),
@@ -440,18 +473,23 @@ export function renderTicketResolvedEmail(params: {
   tenantName: string;
   supportEmail: string;
 }): { subject: string; html: string } {
+  const safeTicketNumber = escapeHtml(params.ticketNumber);
+  const safeSubject = escapeHtml(params.subject);
+  const safeTenantName = escapeHtml(params.tenantName);
+  const safeSupportEmail = escapeHtml(params.supportEmail);
+
   return {
     subject: `[${params.ticketNumber}] ${params.subject} - Resolved`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Your ticket has been resolved</h2>
         <p>Hi,</p>
-        <p>Your ticket <strong>${params.ticketNumber}</strong> has been marked as resolved.</p>
-        <p><strong>Subject:</strong> ${params.subject}</p>
+        <p>Your ticket <strong>${safeTicketNumber}</strong> has been marked as resolved.</p>
+        <p><strong>Subject:</strong> ${safeSubject}</p>
         <p>If you still need help, you can reply to this email to reopen the ticket.</p>
         <hr />
         <p style="color: #666; font-size: 12px;">
-          ${params.tenantName} Support | ${params.supportEmail}
+          ${safeTenantName} Support | ${safeSupportEmail}
         </p>
       </div>
     `.trim(),
@@ -468,23 +506,29 @@ export function renderCsatSurveyEmail(params: {
   tenantName: string;
   supportEmail: string;
 }): { subject: string; html: string } {
+  const safeTicketNumber = escapeHtml(params.ticketNumber);
+  const safeSubject = escapeHtml(params.subject);
+  const safeSurveyUrl = escapeHtml(params.surveyUrl);
+  const safeTenantName = escapeHtml(params.tenantName);
+  const safeSupportEmail = escapeHtml(params.supportEmail);
+
   return {
     subject: `How was your experience? [${params.ticketNumber}]`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>How did we do?</h2>
         <p>Hi,</p>
-        <p>Your ticket <strong>${params.ticketNumber}</strong> ("${params.subject}") was recently resolved.</p>
+        <p>Your ticket <strong>${safeTicketNumber}</strong> ("${safeSubject}") was recently resolved.</p>
         <p>We would love to hear your feedback. Please take a moment to rate your experience:</p>
         <p style="text-align: center; margin: 24px 0;">
-          <a href="${params.surveyUrl}" style="background: #2563EB; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+          <a href="${safeSurveyUrl}" style="background: #2563EB; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
             Rate Your Experience
           </a>
         </p>
         <p style="color: #666; font-size: 14px;">Your feedback helps us improve our support.</p>
         <hr />
         <p style="color: #666; font-size: 12px;">
-          ${params.tenantName} Support | ${params.supportEmail}
+          ${safeTenantName} Support | ${safeSupportEmail}
         </p>
       </div>
     `.trim(),
@@ -572,8 +616,9 @@ export async function processInboundEmail(
       'Adding email as reply to existing ticket',
     );
 
-    // Determine the body to use: prefer text, fall back to HTML stripped of tags
-    const body = parsed.textBody || stripHtmlTags(parsed.htmlBody) || '(Empty reply)';
+    // Determine the body to use: prefer text, fall back to sanitized HTML stripped of tags
+    const rawBody = parsed.textBody || stripHtmlTags(parsed.htmlBody) || '(Empty reply)';
+    const body = sanitizeRichText(rawBody);
 
     // Insert as a reply
     const [reply] = await db
@@ -650,7 +695,8 @@ export async function processInboundEmail(
   const ticketNumber = `TKT-${String(incrementResult.counter).padStart(5, '0')}`;
 
   const subject = parsed.subject || '(No Subject)';
-  const description = parsed.textBody || stripHtmlTags(parsed.htmlBody) || '(No content)';
+  const rawDescription = parsed.textBody || stripHtmlTags(parsed.htmlBody) || '(No content)';
+  const description = sanitizeRichText(rawDescription);
 
   const [newTicket] = await db
     .insert(tickets)
