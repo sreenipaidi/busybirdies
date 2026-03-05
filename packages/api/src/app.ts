@@ -7,6 +7,10 @@ import { healthRoutes } from './routes/health.routes.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { userRoutes } from './routes/users.routes.js';
 import { ticketRoutes } from './routes/tickets.routes.js';
+import { assignmentRuleRoutes } from './routes/assignment-rules.routes.js';
+import { slaPolicyRoutes } from './routes/sla-policies.routes.js';
+import { cannedResponseRoutes } from './routes/canned-responses.routes.js';
+import { kbRoutes } from './routes/kb.routes.js';
 import { registerErrorHandler } from './middleware/error-handler.middleware.js';
 
 export async function buildApp() {
@@ -42,6 +46,10 @@ export async function buildApp() {
   await app.register(authRoutes, { prefix: '/v1' });
   await app.register(userRoutes, { prefix: '/v1' });
   await app.register(ticketRoutes, { prefix: '/v1' });
+  await app.register(assignmentRuleRoutes, { prefix: '/v1' });
+  await app.register(slaPolicyRoutes, { prefix: '/v1' });
+  await app.register(cannedResponseRoutes, { prefix: '/v1' });
+  await app.register(kbRoutes, { prefix: '/v1' });
 
   return app;
 }
