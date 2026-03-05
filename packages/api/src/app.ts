@@ -6,6 +6,7 @@ import { getConfig } from './config.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { userRoutes } from './routes/users.routes.js';
+import { ticketRoutes } from './routes/tickets.routes.js';
 import { registerErrorHandler } from './middleware/error-handler.middleware.js';
 
 export async function buildApp() {
@@ -40,6 +41,7 @@ export async function buildApp() {
   await app.register(healthRoutes, { prefix: '/v1' });
   await app.register(authRoutes, { prefix: '/v1' });
   await app.register(userRoutes, { prefix: '/v1' });
+  await app.register(ticketRoutes, { prefix: '/v1' });
 
   return app;
 }
