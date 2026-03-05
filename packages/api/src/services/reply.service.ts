@@ -7,6 +7,8 @@ import {
   users,
 } from '../db/schema.js';
 import { AppError, NotFoundError, AuthorizationError } from '../lib/errors.js';
+import { getLogger } from '../lib/logger.js';
+import { processMentions } from './mention.service.js';
 import type {
   UserRole,
   ReplySource,
@@ -117,6 +119,16 @@ export async function addReply(
 
   if (!reply) {
     throw new AppError(500, 'INTERNAL_ERROR', 'Failed to create reply');
+  }
+
+  // Side effect for internal notes: process @mentions
+  if (input.is_internal) {
+    try {
+      await processMentions(tenantId, ticketId, input.body, userId);
+    } catch (err) {
+      const logger = getLogger();
+      logger.error({ err, ticketId, userId }, 'Failed to process mentions in internal note');
+    }
   }
 
   // Side effects for non-internal replies

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { Card } from '../components/ui/Card.js';
 import { Button } from '../components/ui/Button.js';
@@ -8,8 +8,12 @@ import { StatusBadge, PriorityBadge, Badge } from '../components/ui/Badge.js';
 import { Avatar } from '../components/ui/Avatar.js';
 import { Spinner } from '../components/ui/Spinner.js';
 import { Tabs, TabPanel } from '../components/ui/Tabs.js';
+import { CollisionBanner } from '../components/features/tickets/CollisionBanner.js';
+import { MentionInput } from '../components/features/tickets/MentionInput.js';
+import { CannedResponsePicker } from '../components/features/tickets/CannedResponsePicker.js';
 import { useTicket, useUpdateTicket } from '../hooks/useTicket.js';
 import { useCreateReply } from '../hooks/useReplies.js';
+import { useCollisionDetection } from '../hooks/useHeartbeat.js';
 import { useUIStore } from '../stores/ui.store.js';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
 import { formatDateTime, formatRelative } from '../lib/format-date.js';
@@ -41,11 +45,17 @@ export function TicketDetailPage() {
   const { data, isLoading, isError, error } = useTicket(id ?? '');
   const updateTicket = useUpdateTicket(id ?? '');
   const createReply = useCreateReply(id ?? '');
+  const { otherViewers, setIsComposing } = useCollisionDetection(id);
 
   const [replyBody, setReplyBody] = useState('');
   const [replyMode, setReplyMode] = useState<'reply' | 'internal'>('reply');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [auditExpanded, setAuditExpanded] = useState(false);
+
+  // Update composing state when the user starts/stops typing
+  useEffect(() => {
+    setIsComposing(replyBody.trim().length > 0);
+  }, [replyBody, setIsComposing]);
 
   const ticket = data?.ticket;
   const replies = data?.replies ?? [];
@@ -311,6 +321,9 @@ export function TicketDetailPage() {
 
   return (
     <div>
+      {/* Collision detection banner */}
+      <CollisionBanner viewers={otherViewers} />
+
       {/* Back link and header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
         <Link
@@ -416,27 +429,35 @@ export function TicketDetailPage() {
                   replyMode === 'internal' && 'bg-internal-note',
                 )}
               >
-                <Textarea
-                  id="reply-editor"
-                  value={replyBody}
-                  onChange={(e) => setReplyBody(e.target.value)}
-                  placeholder={
-                    replyMode === 'internal'
-                      ? 'Write an internal note. Clients will not see this.'
-                      : 'Type your reply here...'
-                  }
-                  className={cn(
-                    'min-h-[120px]',
-                    replyMode === 'internal' && 'bg-yellow-50 border-yellow-200',
-                  )}
-                  aria-label={
-                    replyMode === 'internal'
-                      ? 'Internal note editor'
-                      : 'Reply editor'
-                  }
-                  disabled={createReply.isPending}
-                />
+                {replyMode === 'internal' ? (
+                  <MentionInput
+                    id="reply-editor"
+                    value={replyBody}
+                    onChange={setReplyBody}
+                    placeholder="Write an internal note. Use @name to mention agents. Clients will not see this."
+                    className={cn(
+                      'min-h-[120px] w-full rounded-md border px-3 py-2 text-sm',
+                      'bg-yellow-50 border-yellow-200',
+                      'focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary',
+                    )}
+                    ariaLabel="Internal note editor with @mention support"
+                    disabled={createReply.isPending}
+                  />
+                ) : (
+                  <Textarea
+                    id="reply-editor"
+                    value={replyBody}
+                    onChange={(e) => setReplyBody(e.target.value)}
+                    placeholder="Type your reply here..."
+                    className="min-h-[120px]"
+                    aria-label="Reply editor"
+                    disabled={createReply.isPending}
+                  />
+                )}
                 <div className="flex items-center justify-end gap-2 mt-3">
+                  <CannedResponsePicker
+                    onSelect={(body) => setReplyBody((prev) => prev + body)}
+                  />
                   <Button
                     onClick={handleSendReply}
                     disabled={!replyBody.trim()}
