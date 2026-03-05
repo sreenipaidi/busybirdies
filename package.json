@@ -1,0 +1,28 @@
+{
+  "name": "supportdesk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Customer Support Platform - Multi-tenant SaaS",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "format": "prettier --check \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
+    "db:generate": "pnpm --filter @supportdesk/api db:generate",
+    "db:migrate": "pnpm --filter @supportdesk/api db:migrate",
+    "db:seed": "pnpm --filter @supportdesk/api db:seed",
+    "db:studio": "pnpm --filter @supportdesk/api db:studio",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.9"
+}

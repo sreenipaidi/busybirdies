@@ -1,0 +1,68 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build all packages
+        run: pnpm build
+
+      # TODO: Add deployment steps for your platform (Railway, Render, Fly.io, etc.)
+      # Example for Docker-based deployment:
+      # - name: Build Docker images
+      #   run: |
+      #     docker build -f docker/Dockerfile.api -t supportdesk-api .
+      #     docker build -f docker/Dockerfile.web -t supportdesk-web .
+      #
+      # - name: Push to container registry
+      #   run: |
+      #     docker push supportdesk-api
+      #     docker push supportdesk-web
+      #
+      # - name: Deploy
+      #   run: |
+      #     # Platform-specific deploy command
+      #
+      # - name: Post-deploy smoke test
+      #   run: |
+      #     curl --fail --retry 5 --retry-delay 10 ${{ vars.API_URL }}/v1/health
+      #
+      # - name: Rollback on failure
+      #   if: failure()
+      #   run: |
+      #     echo "Deployment failed. Initiate rollback."
+      #     # Platform-specific rollback command
+
+      - name: Deployment placeholder
+        run: echo "Deployment pipeline configured. Add platform-specific steps above."
