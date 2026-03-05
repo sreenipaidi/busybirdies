@@ -14,6 +14,7 @@ import {
   ConflictError,
   AuthorizationError,
 } from '../lib/errors.js';
+import { getLogger } from '../lib/logger.js';
 import { VALID_STATUS_TRANSITIONS } from '@supportdesk/shared';
 import type {
   TicketStatus,
@@ -325,7 +326,39 @@ export async function createTicket(
     });
   }
 
-  return buildTicketResponse(tenantId, ticket);
+  // --- Post-creation: SLA deadlines ---
+  try {
+    const { calculateAndSetDeadlines } = await import('./sla.service.js');
+    await calculateAndSetDeadlines(
+      tenantId,
+      ticket.id,
+      ticket.priority,
+      ticket.createdAt,
+    );
+  } catch (err) {
+    const logger = getLogger();
+    logger.error({ err, tenantId, ticketId: ticket.id }, 'Failed to calculate SLA deadlines');
+  }
+
+  // --- Post-creation: Auto-assignment (only if not already manually assigned) ---
+  if (!input.assigned_agent_id) {
+    try {
+      const { evaluateAndAssign } = await import('./auto-assign.service.js');
+      await evaluateAndAssign(tenantId, ticket.id);
+    } catch (err) {
+      const logger = getLogger();
+      logger.error({ err, tenantId, ticketId: ticket.id }, 'Failed to auto-assign ticket');
+    }
+  }
+
+  // Re-fetch the ticket to include any SLA/assignment updates
+  const [finalTicket] = await db
+    .select()
+    .from(tickets)
+    .where(eq(tickets.id, ticket.id))
+    .limit(1);
+
+  return buildTicketResponse(tenantId, finalTicket ?? ticket);
 }
 
 /**
