@@ -10,6 +10,8 @@ import { Spinner } from './components/ui/Spinner.js';
 // Eagerly loaded pages (critical path / small)
 import { LoginPage } from './pages/LoginPage.js';
 import { RegisterPage } from './pages/RegisterPage.js';
+import { PortalLoginPage } from './pages/PortalLoginPage.js';
+import { ClientRegisterPage } from './pages/ClientRegisterPage.js';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage.js';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.js';
 import { NotFoundPage } from './pages/NotFoundPage.js';
@@ -90,6 +92,8 @@ export function App() {
           {/* Public / Auth routes */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/portal-login" element={<PortalLoginPage />} />
+            <Route path="/portal-register" element={<ClientRegisterPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -179,7 +183,7 @@ function HomePage() {
             Agent Login
           </a>
           <a
-            href="/login"
+            href="/portal-login"
             className="rounded-md border border-border bg-surface px-6 py-3 text-text-primary font-medium hover:bg-surface-alt transition-colors text-sm"
           >
             Client Portal

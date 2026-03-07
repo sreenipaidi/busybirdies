@@ -5,6 +5,8 @@ import { Button } from '../components/ui/Button.js';
 import { Input, Textarea } from '../components/ui/Input.js';
 import { Select } from '../components/ui/Select.js';
 import { useCreateTicket } from '../hooks/useTickets.js';
+import { useClients } from '../hooks/useAgents.js';
+import { useAuth } from '../hooks/useAuth.js';
 import { useUIStore } from '../stores/ui.store.js';
 
 const PRIORITY_OPTIONS = [
@@ -19,18 +21,30 @@ interface FormErrors {
   subject?: string;
   description?: string;
   priority?: string;
+  client_id?: string;
 }
 
 export function CreateTicketPage() {
   const navigate = useNavigate();
   const addToast = useUIStore((s) => s.addToast);
   const createTicket = useCreateTicket();
+  const { isClient, user, isLoading } = useAuth();
+  const { data: clientsData, isLoading: clientsLoading } = useClients();
 
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('');
+  const [clientId, setClientId] = useState('');
   const [tags, setTags] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const clientOptions = [
+    { value: '', label: 'Select a client', disabled: true },
+    ...(clientsData?.data ?? []).map((c) => ({
+      value: c.id,
+      label: `${c.full_name} (${c.email})`,
+    })),
+  ];
 
   const validate = useCallback((): boolean => {
     const newErrors: FormErrors = {};
@@ -51,9 +65,13 @@ export function CreateTicketPage() {
       newErrors.priority = 'Please select a priority level.';
     }
 
+    if (!isClient && !clientId) {
+      newErrors.client_id = 'Please select a client for this ticket.';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [subject, description, priority]);
+  }, [subject, description, priority, clientId, isClient]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -71,6 +89,7 @@ export function CreateTicketPage() {
           subject: subject.trim(),
           description: description.trim(),
           priority,
+          client_id: isClient ? user?.id : clientId,
           tags: tagList.length > 0 ? tagList : undefined,
         });
         addToast({
@@ -85,12 +104,11 @@ export function CreateTicketPage() {
         });
       }
     },
-    [subject, description, priority, tags, validate, createTicket, addToast, navigate],
+    [subject, description, priority, clientId, tags, validate, createTicket, addToast, navigate, isClient, user],
   );
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Back link */}
       <Link
         to="/tickets"
         className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-primary transition-colors mb-4"
@@ -119,7 +137,25 @@ export function CreateTicketPage() {
       <Card padding="lg">
         <form onSubmit={handleSubmit} noValidate aria-label="Create ticket form">
           <div className="space-y-5">
-            {/* Subject */}
+
+            {!isLoading && !isClient && (
+              <Select
+                label="Client"
+                id="ticket-client"
+                options={clientOptions}
+                value={clientId}
+                onChange={(e) => {
+                  setClientId(e.target.value);
+                  if (errors.client_id) {
+                    setErrors((prev) => ({ ...prev, client_id: undefined }));
+                  }
+                }}
+                error={errors.client_id}
+                disabled={clientsLoading}
+                aria-required="true"
+              />
+            )}
+
             <Input
               label="Subject"
               id="ticket-subject"
@@ -137,7 +173,6 @@ export function CreateTicketPage() {
               aria-required="true"
             />
 
-            {/* Description */}
             <Textarea
               label="Description"
               id="ticket-description"
@@ -155,7 +190,6 @@ export function CreateTicketPage() {
               aria-required="true"
             />
 
-            {/* Priority */}
             <Select
               label="Priority"
               id="ticket-priority"
@@ -171,7 +205,6 @@ export function CreateTicketPage() {
               aria-required="true"
             />
 
-            {/* Tags */}
             <Input
               label="Tags"
               id="ticket-tags"
@@ -181,7 +214,6 @@ export function CreateTicketPage() {
               helperText="Optional. Separate multiple tags with commas."
             />
 
-            {/* Action buttons */}
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
               <Button
                 type="button"

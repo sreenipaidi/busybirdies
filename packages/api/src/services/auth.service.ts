@@ -215,7 +215,7 @@ export async function register(
       passwordHash,
       role: 'client',
       isActive: true,
-      emailVerified: false,
+      emailVerified: process.env.NODE_ENV !== 'production',
     })
     .returning({ id: users.id });
 

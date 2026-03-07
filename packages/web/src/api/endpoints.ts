@@ -10,6 +10,9 @@ export const ENDPOINTS = {
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
   },
+  tenants: {
+    create: '/tenants',
+  },
   users: {
     list: '/users',
     invite: '/users/invite',
@@ -72,3 +75,4 @@ export const ENDPOINTS = {
     portalConfig: '/tenant/portal-config',
   },
 } as const;
+

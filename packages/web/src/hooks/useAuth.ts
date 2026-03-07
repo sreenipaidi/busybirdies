@@ -13,6 +13,7 @@ interface AuthResponse {
 interface LoginParams {
   email: string;
   password: string;
+  portal: string;
 }
 
 interface RegisterParams {
@@ -20,6 +21,14 @@ interface RegisterParams {
   full_name: string;
   password: string;
   company_name: string;
+}
+
+interface CreateTenantParams {
+  company_name: string;
+  subdomain: string;
+  admin_email: string;
+  admin_full_name: string;
+  admin_password: string;
 }
 
 export function useAuth() {
@@ -82,6 +91,16 @@ export function useAuth() {
     [setAuth, navigate],
   );
 
+  const createTenant = useCallback(
+    async (params: CreateTenantParams) => {
+      const data = await api.post<AuthResponse>(ENDPOINTS.tenants.create, params);
+      setAuth(data.user, data.tenant);
+      navigate('/dashboard');
+      return data;
+    },
+    [setAuth, navigate],
+  );
+
   const logout = useCallback(async () => {
     try {
       await api.post(ENDPOINTS.auth.logout);
@@ -112,6 +131,7 @@ export function useAuth() {
     login,
     logout,
     register,
+    createTenant,
     forgotPassword,
     resetPassword,
     isAgent: user?.role === 'agent' || user?.role === 'admin',
@@ -120,3 +140,4 @@ export function useAuth() {
     ApiError,
   };
 }
+

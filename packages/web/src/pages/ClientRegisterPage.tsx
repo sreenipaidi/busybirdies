@@ -8,48 +8,44 @@ import { Input } from '../components/ui/Input.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { ApiError } from '../api/client.js';
 
-const registerSchema = z.object({
-  company_name: z.string().min(1, 'Company name is required.').max(100),
-  subdomain: z
-    .string()
-    .min(3, 'Subdomain must be at least 3 characters.')
-    .max(63)
-    .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/, 'Only lowercase letters, numbers, and hyphens allowed.'),
-  admin_full_name: z.string().min(1, 'Full name is required.').max(100),
-  admin_email: z.string().email('Please enter a valid email address.'),
-  admin_password: z
+const clientRegisterSchema = z.object({
+  portal: z.string().min(1, 'Portal subdomain is required.'),
+  full_name: z.string().min(1, 'Full name is required.').max(100),
+  email: z.string().email('Please enter a valid email address.'),
+  password: z
     .string()
     .min(8, 'Password must be at least 8 characters.')
     .max(128),
 });
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+type ClientRegisterFormData = z.infer<typeof clientRegisterSchema>;
 
-export function RegisterPage() {
-  const { createTenant } = useAuth();
+export function ClientRegisterPage() {
+  const { register: registerClient } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<ClientRegisterFormData>({
+    resolver: zodResolver(clientRegisterSchema),
     defaultValues: {
-      company_name: '',
-      subdomain: '',
-      admin_full_name: '',
-      admin_email: '',
-      admin_password: '',
+      portal: '',
+      full_name: '',
+      email: '',
+      password: '',
     },
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: ClientRegisterFormData) => {
     setServerError(null);
     setIsSubmitting(true);
     try {
-      await createTenant(data);
+      await registerClient(data);
+      setSuccess(true);
     } catch (err) {
       if (err instanceof ApiError) {
         setServerError(err.message);
@@ -61,12 +57,34 @@ export function RegisterPage() {
     }
   };
 
+  if (success) {
+    return (
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-success/10 mb-4">
+          <svg className="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-text-primary mb-2">Registration Successful!</h2>
+        <p className="text-sm text-text-secondary mb-6">
+          Your account has been created. Please check your email to verify your account before signing in.
+        </p>
+        <Link
+          to="/portal-login"
+          className="text-primary hover:text-primary-hover font-medium text-sm"
+        >
+          Go to Portal Login
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">Create your account</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Create a Client Account</h1>
         <p className="text-sm text-text-secondary mt-1">
-          Set up your support platform in minutes
+          Register to submit and track your support tickets
         </p>
       </div>
 
@@ -81,42 +99,33 @@ export function RegisterPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
         <Input
-          label="Company name"
-          type="text"
-          placeholder="Acme Corp"
-          error={errors.company_name?.message}
-          disabled={isSubmitting}
-          {...register('company_name')}
-        />
-
-        <Input
-          label="Subdomain"
+          label="Portal subdomain"
           type="text"
           placeholder="acme"
-          helperText="Your support portal will be at: acme.helpdesk.com"
-          error={errors.subdomain?.message}
+          helperText="The subdomain of your company's support portal."
+          error={errors.portal?.message}
           disabled={isSubmitting}
-          {...register('subdomain')}
+          {...register('portal')}
         />
 
         <Input
-          label="Your name"
+          label="Full name"
           type="text"
           placeholder="Jane Smith"
           autoComplete="name"
-          error={errors.admin_full_name?.message}
+          error={errors.full_name?.message}
           disabled={isSubmitting}
-          {...register('admin_full_name')}
+          {...register('full_name')}
         />
 
         <Input
           label="Email address"
           type="email"
-          placeholder="admin@company.com"
+          placeholder="you@company.com"
           autoComplete="email"
-          error={errors.admin_email?.message}
+          error={errors.email?.message}
           disabled={isSubmitting}
-          {...register('admin_email')}
+          {...register('email')}
         />
 
         <Input
@@ -124,10 +133,10 @@ export function RegisterPage() {
           type="password"
           placeholder="At least 8 characters"
           autoComplete="new-password"
-          error={errors.admin_password?.message}
+          error={errors.password?.message}
           helperText="Must be at least 8 characters."
           disabled={isSubmitting}
-          {...register('admin_password')}
+          {...register('password')}
         />
 
         <Button
@@ -144,7 +153,7 @@ export function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-text-secondary">
         Already have an account?{' '}
-        <Link to="/login" className="text-primary hover:text-primary-hover font-medium">
+        <Link to="/portal-login" className="text-primary hover:text-primary-hover font-medium">
           Sign in
         </Link>
       </p>
