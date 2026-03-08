@@ -151,4 +151,15 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       expires_at: result.expiresAt,
     });
   });
+  // Verify email address via activation token
+  app.get('/auth/verify-email', async (request, reply) => {
+    const { token } = request.query as { token?: string };
+    if (!token) {
+      return reply.status(400).send({ error: 'TOKEN_REQUIRED', message: 'Verification token is required.' });
+    }
+    const result = await authService.verifyEmail(token);
+    return reply.send(result);
+  });
+
+
 }

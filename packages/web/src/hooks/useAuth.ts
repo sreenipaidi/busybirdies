@@ -20,7 +20,8 @@ interface RegisterParams {
   email: string;
   full_name: string;
   password: string;
-  company_name: string;
+  portal: string;
+  company_name?: string;
 }
 
 interface CreateTenantParams {

@@ -20,6 +20,8 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60000),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
   SENDGRID_WEBHOOK_SECRET: z.string().optional(),
+  SENDGRID_API_KEY: z.string().optional(),
+  SENDGRID_FROM_EMAIL: z.string().default('noreply@helpdesk.com'),
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

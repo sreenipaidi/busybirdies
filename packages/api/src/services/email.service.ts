@@ -3,6 +3,7 @@ import { getDb } from '../db/connection.js';
 import { tenants, users, tickets, ticketReplies, ticketAuditEntries } from '../db/schema.js';
 import { AppError, NotFoundError } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
+import { getConfig } from '../config.js';
 import { sanitizeRichText } from '../lib/sanitize.js';
 import type { UserRole } from '@supportdesk/shared';
 
@@ -546,24 +547,65 @@ export function renderCsatSurveyEmail(params: {
  * TODO: Integrate with SendGrid API or nodemailer + SMTP transport
  * for production email delivery.
  */
+/**
+ * Render the email verification template.
+ */
+export function renderVerificationEmail(params: {
+  fullName: string;
+  verifyUrl: string;
+  tenantName: string;
+}): { subject: string; html: string } {
+  const safeName = escapeHtml(params.fullName);
+  const safeUrl = escapeHtml(params.verifyUrl);
+  const safeTenantName = escapeHtml(params.tenantName);
+
+  return {
+    subject: `Verify your email address - ${params.tenantName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Verify your email address</h2>
+        <p>Hi ${safeName},</p>
+        <p>Thanks for registering with ${safeTenantName}. Please verify your email address by clicking the button below:</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="${safeUrl}" style="background: #2563EB; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+            Verify Email Address
+          </a>
+        </p>
+        <p style="color: #666; font-size: 14px;">This link expires in 24 hours. If you did not register, you can ignore this email.</p>
+        <p style="color: #666; font-size: 12px;">Or copy this link: ${safeUrl}</p>
+      </div>
+    `.trim(),
+  };
+}
+
+/**
+ * Send an email via SendGrid if API key is configured, otherwise log (dev mode).
+ */
 export async function sendEmail(
   to: string,
   subject: string,
   html: string,
 ): Promise<void> {
   const logger = getLogger();
+  const config = getConfig();
 
-  // TODO: Replace with actual SendGrid/nodemailer implementation
-  // Example production implementation:
-  //
-  // import sgMail from '@sendgrid/mail';
-  // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  // await sgMail.send({ to, from: 'support@helpdesk.com', subject, html });
-
-  logger.info(
-    { to, subject, htmlLength: html.length },
-    'Email send requested (stub -- not actually sent)',
-  );
+  if (config.SENDGRID_API_KEY && config.SENDGRID_API_KEY !== 'SG.xxx') {
+    const sgMail = await import('@sendgrid/mail');
+    sgMail.default.setApiKey(config.SENDGRID_API_KEY);
+    await sgMail.default.send({
+      to,
+      from: config.SENDGRID_FROM_EMAIL,
+      subject,
+      html,
+    });
+    logger.info({ to, subject }, 'Email sent via SendGrid');
+  } else {
+    // Dev mode: log the email instead of sending
+    logger.info(
+      { to, subject, htmlLength: html.length },
+      '[DEV] Email send requested (no SendGrid key -- not actually sent)',
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------

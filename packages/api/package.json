@@ -25,6 +25,7 @@
     "@fastify/helmet": "^13.0.1",
     "@fastify/multipart": "^9.0.3",
     "@fastify/rate-limit": "^10.2.2",
+    "@sendgrid/mail": "^8.1.6",
     "@supportdesk/shared": "workspace:*",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.34.8",

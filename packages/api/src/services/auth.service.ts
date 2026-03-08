@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { eq, and } from 'drizzle-orm';
 import { getDb } from '../db/connection.js';
 import { users, tenants, slaPolicies } from '../db/schema.js';
@@ -11,6 +12,8 @@ import {
   NotFoundError,
 } from '../lib/errors.js';
 import { SLA_DEFAULTS } from '@supportdesk/shared';
+import { sendEmail, renderVerificationEmail } from './email.service.js';
+import { getLogger } from '../lib/logger.js';
 import type { UserRole } from '@supportdesk/shared';
 import type { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from '@supportdesk/shared';
 
@@ -206,6 +209,10 @@ export async function register(
 
   const passwordHash = await hashPassword(input.password);
 
+  const isDevMode = process.env.NODE_ENV !== 'production';
+  const activationToken = isDevMode ? null : crypto.randomBytes(32).toString('hex');
+  const activationTokenExpires = isDevMode ? null : new Date(Date.now() + 24 * 60 * 60 * 1000);
+
   const [newUser] = await db
     .insert(users)
     .values({
@@ -215,7 +222,9 @@ export async function register(
       passwordHash,
       role: 'client',
       isActive: true,
-      emailVerified: process.env.NODE_ENV !== 'production',
+      emailVerified: isDevMode,
+      activationToken,
+      activationTokenExpires,
     })
     .returning({ id: users.id });
 
@@ -223,12 +232,27 @@ export async function register(
     throw new AppError(500, 'INTERNAL_ERROR', 'Failed to create user');
   }
 
-  // TODO: Dispatch verification email via email service / job queue
+  // Send verification email in production
+  if (!isDevMode && activationToken) {
+    const config = getConfig();
+    const verifyUrl = `${config.FRONTEND_URL}/verify-email?token=${activationToken}`;
+    const { subject, html } = renderVerificationEmail({
+      fullName: input.full_name,
+      verifyUrl,
+      tenantName: tenant.name,
+    });
+    try {
+      await sendEmail(input.email, subject, html);
+    } catch (err) {
+      getLogger().error({ err, email: input.email }, 'Failed to send verification email');
+    }
+  }
 
   return {
     userId: newUser.id,
-    message:
-      'Registration successful. Please check your email to verify your account.',
+    message: isDevMode
+      ? 'Registration successful. You can now log in.'
+      : 'Registration successful. Please check your email to verify your account.',
   };
 }
 
@@ -548,4 +572,45 @@ function parseExpiryToMs(expiry: string): number {
     default:
       return 8 * 60 * 60 * 1000;
   }
+}
+
+/**
+ * Verify a user's email address using an activation token.
+ */
+export async function verifyEmail(token: string): Promise<{ message: string }> {
+  const db = getDb();
+
+  const [user] = await db
+    .select({
+      id: users.id,
+      emailVerified: users.emailVerified,
+      activationTokenExpires: users.activationTokenExpires,
+    })
+    .from(users)
+    .where(eq(users.activationToken, token))
+    .limit(1);
+
+  if (!user) {
+    throw new AppError(400, 'INVALID_TOKEN', 'Invalid or expired verification link.');
+  }
+
+  if (user.emailVerified) {
+    return { message: 'Email already verified. You can now log in.' };
+  }
+
+  if (user.activationTokenExpires && user.activationTokenExpires < new Date()) {
+    throw new AppError(400, 'TOKEN_EXPIRED', 'Verification link has expired. Please register again.');
+  }
+
+  await db
+    .update(users)
+    .set({
+      emailVerified: true,
+      activationToken: null,
+      activationTokenExpires: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id));
+
+  return { message: 'Email verified successfully. You can now log in.' };
 }

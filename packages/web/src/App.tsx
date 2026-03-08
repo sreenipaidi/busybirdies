@@ -11,6 +11,7 @@ import { Spinner } from './components/ui/Spinner.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { RegisterPage } from './pages/RegisterPage.js';
 import { PortalLoginPage } from './pages/PortalLoginPage.js';
+import { VerifyEmailPage } from './pages/VerifyEmailPage.js';
 import { ClientRegisterPage } from './pages/ClientRegisterPage.js';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage.js';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.js';
@@ -94,7 +95,8 @@ export function App() {
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/portal-login" element={<PortalLoginPage />} />
-            <Route path="/portal-register" element={<ClientRegisterPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/portal-register" element={<ClientRegisterPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
