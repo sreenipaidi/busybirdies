@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import { verifyToken } from '../lib/jwt.js';
 import { AuthenticationError } from '../lib/errors.js';
 import type { JwtPayload } from '../lib/jwt.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 
 /** Shape of the authenticated user context attached to every request. */
 export interface RequestUser {

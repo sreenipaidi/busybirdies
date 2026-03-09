@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { signToken } from '../../lib/jwt.js';
-import type { Ticket, TicketReply, PaginatedResponse, TicketListItem } from '@supportdesk/shared';
+import type { Ticket, TicketReply, PaginatedResponse, TicketListItem } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Mocks -- must match exact function names used in routes

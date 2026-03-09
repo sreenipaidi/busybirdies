@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { submitCSATSchema } from '@supportdesk/shared';
+import { submitCSATSchema } from '@busybirdies/shared';
 import * as csatService from '../services/csat.service.js';
 
 /**

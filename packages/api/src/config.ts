@@ -13,7 +13,7 @@ const envSchema = z.object({
   JWT_SECRET: z
     .string()
     .min(32, 'JWT_SECRET must be at least 32 characters for adequate security'),
-  JWT_ISSUER: z.string().default('supportdesk'),
+  JWT_ISSUER: z.string().default('busybirdies'),
   JWT_EMPLOYEE_EXPIRY: z.string().default('8h'),
   JWT_CLIENT_EXPIRY: z.string().default('24h'),
   LOG_LEVEL: z.string().default('info'),

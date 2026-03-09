@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildApp } from '../app.js';
 import type { FastifyInstance } from 'fastify';
 import { signToken } from '../lib/jwt.js';
-import type { UserRole, TicketPriority, TicketSource, UserSummary } from '@supportdesk/shared';
+import type { UserRole, TicketPriority, TicketSource, UserSummary } from '@busybirdies/shared';
 
 // -------------------------------------------------------------------
 // Mock services

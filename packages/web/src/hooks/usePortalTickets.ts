@@ -6,7 +6,7 @@ import type {
   TicketListItem,
   TicketReply,
   PaginatedResponse,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /**
  * Filter parameters for the portal (client) ticket list.

@@ -10,7 +10,7 @@ import { Tabs } from '../../components/ui/Tabs.js';
 import { usePortalTickets } from '../../hooks/usePortalTickets.js';
 import { useDebounce } from '../../hooks/useDebounce.js';
 import { formatRelative } from '../../lib/format-date.js';
-import type { TicketListItem } from '@supportdesk/shared';
+import type { TicketListItem } from '@busybirdies/shared';
 import type { PortalTicketFilters } from '../../hooks/usePortalTickets.js';
 import type { Column } from '../../components/ui/Table.js';
 import type { TicketStatusVariant, PriorityVariant } from '../../components/ui/Badge.js';

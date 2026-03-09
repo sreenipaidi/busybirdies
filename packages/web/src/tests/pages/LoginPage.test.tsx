@@ -47,7 +47,7 @@ describe('LoginPage', () => {
 
   it('renders the login form', () => {
     renderWithProviders(<LoginPage />);
-    expect(screen.getByText('Welcome to SupportDesk')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to BusyBirdies')).toBeInTheDocument();
     expect(screen.getByText('Sign in to your account')).toBeInTheDocument();
     expect(screen.getByLabelText('Email address')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();

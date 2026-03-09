@@ -1,4 +1,4 @@
-import type { HeartbeatViewer } from '@supportdesk/shared';
+import type { HeartbeatViewer } from '@busybirdies/shared';
 
 interface CollisionBannerProps {
   /** List of other agents currently viewing the ticket. */

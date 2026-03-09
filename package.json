@@ -1,5 +1,5 @@
 {
-  "name": "supportdesk",
+  "name": "busybirdies",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,10 +14,10 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:coverage": "pnpm -r test:coverage",
-    "db:generate": "pnpm --filter @supportdesk/api db:generate",
-    "db:migrate": "pnpm --filter @supportdesk/api db:migrate",
-    "db:seed": "pnpm --filter @supportdesk/api db:seed",
-    "db:studio": "pnpm --filter @supportdesk/api db:studio",
+    "db:generate": "pnpm --filter @busybirdies/api db:generate",
+    "db:migrate": "pnpm --filter @busybirdies/api db:migrate",
+    "db:seed": "pnpm --filter @busybirdies/api db:seed",
+    "db:studio": "pnpm --filter @busybirdies/api db:studio",
     "clean": "pnpm -r clean && rm -rf node_modules"
   },
   "engines": {

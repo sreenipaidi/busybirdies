@@ -9,7 +9,7 @@ import { useAuthStore } from '../../stores/auth.store.js';
 import { usePortalTickets, usePortalStats } from '../../hooks/usePortalTickets.js';
 import { formatRelative } from '../../lib/format-date.js';
 import { cn } from '../../lib/cn.js';
-import type { TicketListItem } from '@supportdesk/shared';
+import type { TicketListItem } from '@busybirdies/shared';
 import type { TicketStatusVariant, PriorityVariant } from '../../components/ui/Badge.js';
 
 export function PortalDashboardPage() {

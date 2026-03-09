@@ -15,7 +15,7 @@ import {
   AuthorizationError,
 } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
-import { VALID_STATUS_TRANSITIONS } from '@supportdesk/shared';
+import { VALID_STATUS_TRANSITIONS } from '@busybirdies/shared';
 import type {
   TicketStatus,
   TicketPriority,
@@ -31,7 +31,7 @@ import type {
   CreateTicketInput,
   UpdateTicketInput,
   TicketListQuery,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /** Internal type for DB user rows used in ticket operations. */
 interface DbUser {

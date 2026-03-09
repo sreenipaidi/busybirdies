@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PortalCreateTicketPage } from '../../pages/portal/PortalCreateTicketPage.js';
 import { PortalDashboardPage } from '../../pages/portal/PortalDashboardPage.js';
 import { PortalTicketsPage } from '../../pages/portal/PortalTicketsPage.js';
-import type { PaginatedResponse, TicketListItem, KBSearchResult, Ticket } from '@supportdesk/shared';
+import type { PaginatedResponse, TicketListItem, KBSearchResult, Ticket } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Mocks

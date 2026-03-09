@@ -23,4 +23,4 @@ export type {
   HeartbeatViewer,
   PaginatedResponse,
   ErrorResponse,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';

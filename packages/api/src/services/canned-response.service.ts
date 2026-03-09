@@ -10,7 +10,7 @@ import type {
   PaginatedResponse,
   CreateCannedResponseInput,
   UpdateCannedResponseInput,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /**
  * Convert a DB canned response row to the API response shape.

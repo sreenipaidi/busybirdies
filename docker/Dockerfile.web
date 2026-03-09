@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY --from=deps /app/packages/web/node_modules ./packages/web/node_modules
 COPY . .
-RUN pnpm --filter @supportdesk/shared build && pnpm --filter @supportdesk/web build
+RUN pnpm --filter @busybirdies/shared build && pnpm --filter @busybirdies/web build
 
 # Stage 3: Serve with nginx
 FROM nginx:alpine AS runner

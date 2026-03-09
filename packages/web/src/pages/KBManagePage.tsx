@@ -16,7 +16,7 @@ import {
   useKBArticles,
   useDeleteKBArticle,
 } from '../hooks/useKBArticles.js';
-import type { KBCategory } from '@supportdesk/shared';
+import type { KBCategory } from '@busybirdies/shared';
 
 /**
  * Admin KB management page.

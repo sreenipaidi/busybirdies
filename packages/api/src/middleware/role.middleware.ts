@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthenticationError, AuthorizationError } from '../lib/errors.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 
 /**
  * Factory function that returns a Fastify preHandler hook enforcing role-based access.

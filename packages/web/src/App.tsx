@@ -176,7 +176,7 @@ function HomePage() {
         <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary mb-6">
           <span className="text-white font-bold text-2xl">SD</span>
         </div>
-        <h1 className="text-4xl font-bold text-text-primary mb-2">SupportDesk</h1>
+        <h1 className="text-4xl font-bold text-text-primary mb-2">BusyBirdies</h1>
         <p className="text-lg text-text-secondary mb-8">Customer Support Platform</p>
         <div className="flex gap-4 justify-center">
           <a

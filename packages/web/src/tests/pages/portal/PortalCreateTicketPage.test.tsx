@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PortalCreateTicketPage } from '../../../pages/portal/PortalCreateTicketPage.js';
-import type { PaginatedResponse, KBSearchResult, Ticket } from '@supportdesk/shared';
+import type { PaginatedResponse, KBSearchResult, Ticket } from '@busybirdies/shared';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router', async () => {

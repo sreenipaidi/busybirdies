@@ -130,7 +130,7 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps = {}) {
             <span className="text-white font-bold text-sm">SD</span>
           </div>
           {!sidebarCollapsed && (
-            <span className="font-semibold text-text-primary text-base">SupportDesk</span>
+            <span className="font-semibold text-text-primary text-base">BusyBirdies</span>
           )}
         </div>
       </div>

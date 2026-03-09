@@ -5,7 +5,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   createTenantSchema,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 import * as authService from '../services/auth.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { getConfig } from '../config.js';

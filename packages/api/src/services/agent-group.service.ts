@@ -7,8 +7,8 @@ import {
   NotFoundError,
 } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
-import type { UserRole } from '@supportdesk/shared';
-import type { AgentGroup, AgentGroupSummary, UserSummary } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
+import type { AgentGroup, AgentGroupSummary, UserSummary } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Input Types

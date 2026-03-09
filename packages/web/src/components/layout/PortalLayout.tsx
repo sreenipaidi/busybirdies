@@ -42,7 +42,7 @@ export function PortalLayout() {
                 </div>
               )}
               <span className="font-semibold text-text-primary hidden sm:block">
-                {tenant?.name || 'SupportDesk'}
+                {tenant?.name || 'BusyBirdies'}
               </span>
             </NavLink>
 

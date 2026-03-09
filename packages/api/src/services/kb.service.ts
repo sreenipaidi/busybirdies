@@ -18,8 +18,8 @@ import type {
   UpdateKBCategoryInput,
   CreateKBArticleInput,
   UpdateKBArticleInput,
-} from '@supportdesk/shared';
-import type { ArticleStatus, UserRole } from '@supportdesk/shared';
+} from '@busybirdies/shared';
+import type { ArticleStatus, UserRole } from '@busybirdies/shared';
 
 /**
  * Generate a URL-safe slug from a title string.

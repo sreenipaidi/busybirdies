@@ -3,7 +3,7 @@ import {
   createAssignmentRuleSchema,
   updateAssignmentRuleSchema,
   reorderRulesSchema,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 import * as assignmentService from '../services/assignment.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';

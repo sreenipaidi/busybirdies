@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY --from=deps /app/packages/api/node_modules ./packages/api/node_modules
 COPY . .
-RUN pnpm --filter @supportdesk/shared build && pnpm --filter @supportdesk/api build
+RUN pnpm --filter @busybirdies/shared build && pnpm --filter @busybirdies/api build
 
 # Stage 3: Production image
 FROM node:22-alpine AS runner

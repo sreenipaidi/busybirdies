@@ -4,7 +4,7 @@ import { ENDPOINTS } from '../api/endpoints.js';
 import type {
   TicketReply,
   PaginatedResponse,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 export function useReplies(ticketId: string) {
   return useQuery<PaginatedResponse<TicketReply>>({

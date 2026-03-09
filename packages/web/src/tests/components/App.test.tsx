@@ -13,9 +13,9 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe('App', () => {
-  it('should render the home page with SupportDesk title', () => {
+  it('should render the home page with BusyBirdies title', () => {
     renderWithProviders(<App />);
-    expect(screen.getByText('SupportDesk')).toBeInTheDocument();
+    expect(screen.getByText('BusyBirdies')).toBeInTheDocument();
     expect(screen.getByText('Customer Support Platform')).toBeInTheDocument();
   });
 

@@ -1,4 +1,4 @@
-# SupportDesk
+# BusyBirdies
 
 Multi-tenant customer support platform built with React, Fastify, PostgreSQL, and Redis.
 

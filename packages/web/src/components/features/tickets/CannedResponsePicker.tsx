@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useCannedResponses } from '../../../hooks/useCannedResponses.js';
 import { Button } from '../../ui/Button.js';
 import { Spinner } from '../../ui/Spinner.js';
-import type { CannedResponse } from '@supportdesk/shared';
+import type { CannedResponse } from '@busybirdies/shared';
 
 interface CannedResponsePickerProps {
   /** Callback invoked when a canned response is selected. */

@@ -8,8 +8,8 @@ import { Input } from '../components/ui/Input.js';
 import { Select } from '../components/ui/Select.js';
 import { useUsers, useInviteUser, useUpdateUser } from '../hooks/useUsers.js';
 import { useUIStore } from '../stores/ui.store.js';
-import { ROLE_LABELS } from '@supportdesk/shared';
-import type { User } from '@supportdesk/shared';
+import { ROLE_LABELS } from '@busybirdies/shared';
+import type { User } from '@busybirdies/shared';
 
 const ROLE_FILTER_OPTIONS = [
   { value: '', label: 'All roles' },

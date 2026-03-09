@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { signToken } from '../../lib/jwt.js';
-import type { AssignmentRule, Ticket } from '@supportdesk/shared';
+import type { AssignmentRule, Ticket } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Mocks

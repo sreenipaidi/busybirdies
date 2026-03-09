@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { CollisionBanner } from '../../components/features/tickets/CollisionBanner.js';
-import type { HeartbeatViewer } from '@supportdesk/shared';
+import type { HeartbeatViewer } from '@busybirdies/shared';
 
 describe('CollisionBanner', () => {
   it('should render nothing when there are no viewers', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ConflictError, NotFoundError, AuthorizationError, AppError } from '../lib/errors.js';
-import { VALID_STATUS_TRANSITIONS } from '@supportdesk/shared';
-import type { TicketStatus } from '@supportdesk/shared';
+import { VALID_STATUS_TRANSITIONS } from '@busybirdies/shared';
+import type { TicketStatus } from '@busybirdies/shared';
 
 // -------------------------------------------------------------------
 // Mock helpers

@@ -7,7 +7,7 @@ import {
   updateKBArticleSchema,
   kbArticleFeedbackSchema,
   kbSearchQuerySchema,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 import * as kbService from '../services/kb.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';

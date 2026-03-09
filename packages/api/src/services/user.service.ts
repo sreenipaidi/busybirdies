@@ -8,13 +8,13 @@ import {
   NotFoundError,
   AuthorizationError,
 } from '../lib/errors.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 import type {
   InviteUserInput,
   ActivateUserInput,
   UpdateUserInput,
   UserListQuery,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /** User response shape without sensitive fields. */
 export interface UserResponse {

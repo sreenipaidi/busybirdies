@@ -5,7 +5,7 @@ import { AppError, NotFoundError } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
 import { getConfig } from '../config.js';
 import { sanitizeRichText } from '../lib/sanitize.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Types

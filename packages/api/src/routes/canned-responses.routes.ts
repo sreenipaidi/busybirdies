@@ -3,7 +3,7 @@ import { z } from 'zod';
 import {
   createCannedResponseSchema,
   updateCannedResponseSchema,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 import * as cannedResponseService from '../services/canned-response.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';

@@ -7,7 +7,7 @@ import { LoginPage } from '../../pages/LoginPage.js';
 import { DashboardPage } from '../../pages/DashboardPage.js';
 import { TicketsPage } from '../../pages/TicketsPage.js';
 import { useAuthStore } from '../../stores/auth.store.js';
-import type { PaginatedResponse, TicketListItem } from '@supportdesk/shared';
+import type { PaginatedResponse, TicketListItem } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -133,7 +133,7 @@ describe('Integration: Login -> Dashboard -> Tickets navigation flow', () => {
     renderWithProviders(<LoginPage />);
 
     // Verify login form renders
-    expect(screen.getByText('Welcome to SupportDesk')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to BusyBirdies')).toBeInTheDocument();
     expect(screen.getByLabelText('Email address')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
 

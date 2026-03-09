@@ -17,7 +17,7 @@ import type {
   CreateAssignmentRuleInput,
   UpdateAssignmentRuleInput,
   ReorderRulesInput,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /**
  * Convert a DB assignment rule row into the API response shape.

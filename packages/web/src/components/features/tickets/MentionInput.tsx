@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAgents } from '../../../hooks/useAgents.js';
-import type { User } from '@supportdesk/shared';
+import type { User } from '@busybirdies/shared';
 
 interface MentionInputProps {
   /** Current value of the text area. */

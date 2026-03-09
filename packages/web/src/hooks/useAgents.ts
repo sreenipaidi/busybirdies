@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client.js';
 import { ENDPOINTS } from '../api/endpoints.js';
-import type { User, PaginatedResponse } from '@supportdesk/shared';
+import type { User, PaginatedResponse } from '@busybirdies/shared';
 
 export function useAgents() {
   return useQuery<PaginatedResponse<User>>({

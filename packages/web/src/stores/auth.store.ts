@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User, TenantSummary } from '@supportdesk/shared';
+import type { User, TenantSummary } from '@busybirdies/shared';
 
 export interface AuthState {
   user: User | null;

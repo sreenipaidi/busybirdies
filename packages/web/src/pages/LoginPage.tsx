@@ -55,7 +55,7 @@ export function LoginPage() {
   return (
     <div>
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">Welcome to SupportDesk</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Welcome to BusyBirdies</h1>
         <p className="text-sm text-text-secondary mt-1">Sign in to your account</p>
       </div>
 

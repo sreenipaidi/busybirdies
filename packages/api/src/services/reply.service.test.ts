@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotFoundError, AuthorizationError, AppError } from '../lib/errors.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 
 // -------------------------------------------------------------------
 // Mock helpers

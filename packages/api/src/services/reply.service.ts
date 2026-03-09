@@ -16,7 +16,7 @@ import type {
   UserSummary,
   PaginatedResponse,
   CreateReplyInput,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /**
  * Convert a DB user row to a UserSummary response shape.

@@ -2,7 +2,7 @@ import { eq, and, inArray } from 'drizzle-orm';
 import { getDb } from '../db/connection.js';
 import { users } from '../db/schema.js';
 import { getLogger } from '../lib/logger.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 
 /** Regex pattern to match @[agent_name] mentions in text. */
 const MENTION_PATTERN = /@\[([^\]]+)\]/g;

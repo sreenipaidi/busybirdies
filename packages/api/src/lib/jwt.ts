@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import type { SignOptions } from 'jsonwebtoken';
 import { getConfig } from '../config.js';
-import type { UserRole } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
 
 /** JWT payload shape for all tokens issued by the platform. */
 export interface JwtPayload {

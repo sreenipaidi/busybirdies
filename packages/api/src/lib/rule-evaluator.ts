@@ -1,4 +1,4 @@
-import type { ConditionField, ConditionOperator } from '@supportdesk/shared';
+import type { ConditionField, ConditionOperator } from '@busybirdies/shared';
 
 /**
  * Shape of a single rule condition to evaluate.

@@ -5,7 +5,7 @@ import type {
   TicketListItem,
   PaginatedResponse,
   Ticket,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 export interface TicketFilters {
   status?: string;

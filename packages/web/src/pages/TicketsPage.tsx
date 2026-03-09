@@ -12,7 +12,7 @@ import { useDebounce } from '../hooks/useDebounce.js';
 import { formatRelative } from '../lib/format-date.js';
 import { formatSLATimeRemaining, getSLAStatus } from '../lib/format-sla.js';
 import { cn } from '../lib/cn.js';
-import type { TicketListItem } from '@supportdesk/shared';
+import type { TicketListItem } from '@busybirdies/shared';
 import type { TicketFilters } from '../hooks/useTickets.js';
 import type { Column } from '../components/ui/Table.js';
 import type { TicketStatusVariant, PriorityVariant } from '../components/ui/Badge.js';

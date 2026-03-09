@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../api/client.js';
 import { ENDPOINTS } from '../api/endpoints.js';
-import type { HeartbeatViewer } from '@supportdesk/shared';
+import type { HeartbeatViewer } from '@busybirdies/shared';
 
 /** Interval in milliseconds between heartbeat requests. */
 const HEARTBEAT_INTERVAL_MS = 10_000;

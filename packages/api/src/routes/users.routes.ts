@@ -4,7 +4,7 @@ import {
   activateUserSchema,
   updateUserSchema,
   userListQuerySchema,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 import * as userService from '../services/user.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useAuthStore } from '../stores/auth.store.js';
 import { api, ApiError } from '../api/client.js';
 import { ENDPOINTS } from '../api/endpoints.js';
-import type { User, TenantSummary } from '@supportdesk/shared';
+import type { User, TenantSummary } from '@busybirdies/shared';
 
 interface AuthResponse {
   user: User;

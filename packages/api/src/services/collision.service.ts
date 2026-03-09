@@ -1,4 +1,4 @@
-import type { HeartbeatViewer } from '@supportdesk/shared';
+import type { HeartbeatViewer } from '@busybirdies/shared';
 import { getLogger } from '../lib/logger.js';
 
 /** TTL in milliseconds -- viewers are removed if no heartbeat within this period. */

@@ -11,7 +11,7 @@ import type {
   UpdateKBCategoryInput,
   CreateKBArticleInput,
   UpdateKBArticleInput,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 // ---- Query keys ----
 

@@ -5,7 +5,7 @@ import {
   updateTicketSchema,
   createReplySchema,
   ticketListQuerySchema,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 import * as ticketService from '../services/ticket.service.js';
 import * as replyService from '../services/reply.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/client.js';
 import { ENDPOINTS } from '../api/endpoints.js';
-import type { CannedResponse, PaginatedResponse } from '@supportdesk/shared';
+import type { CannedResponse, PaginatedResponse } from '@busybirdies/shared';
 
 /** Filters for listing canned responses. */
 interface CannedResponseFilters {

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { updateTenantSchema } from '@supportdesk/shared';
+import { updateTenantSchema } from '@busybirdies/shared';
 import * as tenantService from '../services/tenant.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';

@@ -1,13 +1,12 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { eq, and } from 'drizzle-orm';
-import { heartbeatSchema } from '@supportdesk/shared';
+import { heartbeatSchema } from '@busybirdies/shared';
 import * as collisionService from '../services/collision.service.js';
 import { getDb } from '../db/connection.js';
 import { users } from '../db/schema.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';
-import { requireRole } from '../middleware/role.middleware.js';
 import { getLogger } from '../lib/logger.js';
 
 /** Schema for validating the ticket ID path parameter. */

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { updateSLAPolicySchema } from '@supportdesk/shared';
+import { updateSLAPolicySchema } from '@busybirdies/shared';
 import * as slaService from '../services/sla.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';

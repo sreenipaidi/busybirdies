@@ -5,7 +5,7 @@ import type {
   Ticket,
   TicketReply,
   AuditEntry,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 interface TicketDetailResponse {
   ticket: Ticket;

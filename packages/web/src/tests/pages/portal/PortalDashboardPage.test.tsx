@@ -3,7 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PortalDashboardPage } from '../../../pages/portal/PortalDashboardPage.js';
-import type { PaginatedResponse, TicketListItem } from '@supportdesk/shared';
+import type { PaginatedResponse, TicketListItem } from '@busybirdies/shared';
 
 // Mock navigate
 const mockNavigate = vi.fn();

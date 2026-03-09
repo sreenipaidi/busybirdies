@@ -19,7 +19,7 @@ import { useMediaQuery } from '../hooks/useMediaQuery.js';
 import { formatDateTime, formatRelative } from '../lib/format-date.js';
 import { formatSLATimeRemaining, getSLAStatus } from '../lib/format-sla.js';
 import { cn } from '../lib/cn.js';
-import type { TicketReply, AuditEntry } from '@supportdesk/shared';
+import type { TicketReply, AuditEntry } from '@busybirdies/shared';
 import type { TicketStatusVariant, PriorityVariant } from '../components/ui/Badge.js';
 
 const STATUS_OPTIONS = [

@@ -11,11 +11,11 @@ import {
   ConflictError,
   NotFoundError,
 } from '../lib/errors.js';
-import { SLA_DEFAULTS } from '@supportdesk/shared';
+import { SLA_DEFAULTS } from '@busybirdies/shared';
 import { sendEmail, renderVerificationEmail } from './email.service.js';
 import { getLogger } from '../lib/logger.js';
-import type { UserRole } from '@supportdesk/shared';
-import type { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from '@supportdesk/shared';
+import type { UserRole } from '@busybirdies/shared';
+import type { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from '@busybirdies/shared';
 
 const MAX_FAILED_ATTEMPTS = 10;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes

@@ -9,7 +9,7 @@ import type {
   SLAPolicy,
   TicketPriority,
   UpdateSLAPolicyInput,
-} from '@supportdesk/shared';
+} from '@busybirdies/shared';
 
 /**
  * Convert a DB SLA policy row to the API response shape.

@@ -3,24 +3,24 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: supportdesk-postgres
+    container_name: busybirdies-postgres
     environment:
-      POSTGRES_USER: supportdesk
-      POSTGRES_PASSWORD: supportdesk
-      POSTGRES_DB: supportdesk
+      POSTGRES_USER: busybirdies
+      POSTGRES_PASSWORD: busybirdies
+      POSTGRES_DB: busybirdies
     ports:
       - "5432:5432"
     volumes:
       - .docker-data/postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U supportdesk"]
+      test: ["CMD-SHELL", "pg_isready -U busybirdies"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: supportdesk-redis
+    container_name: busybirdies-redis
     ports:
       - "6379:6379"
     volumes:
@@ -33,7 +33,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: supportdesk-minio
+    container_name: busybirdies-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin

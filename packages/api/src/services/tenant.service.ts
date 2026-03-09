@@ -3,7 +3,7 @@ import { getDb } from '../db/connection.js';
 import { tenants } from '../db/schema.js';
 import { NotFoundError } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
-import type { Tenant, PortalConfig, UpdateTenantInput } from '@supportdesk/shared';
+import type { Tenant, PortalConfig, UpdateTenantInput } from '@busybirdies/shared';
 
 // ---------------------------------------------------------------------------
 // Get Tenant Configuration

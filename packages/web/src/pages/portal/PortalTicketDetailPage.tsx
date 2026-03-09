@@ -10,7 +10,7 @@ import { usePortalTicketDetail, usePortalCreateReply } from '../../hooks/usePort
 import { useUIStore } from '../../stores/ui.store.js';
 import { formatDateTime, formatRelative } from '../../lib/format-date.js';
 import { cn } from '../../lib/cn.js';
-import type { TicketReply } from '@supportdesk/shared';
+import type { TicketReply } from '@busybirdies/shared';
 import type { TicketStatusVariant, PriorityVariant } from '../../components/ui/Badge.js';
 
 export function PortalTicketDetailPage() {

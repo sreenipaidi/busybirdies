@@ -10,7 +10,7 @@ import {
 import { getActiveRules } from './assignment.service.js';
 import { evaluateRules } from '../lib/rule-evaluator.js';
 import type { TicketContext } from '../lib/rule-evaluator.js';
-import type { RuleCondition } from '@supportdesk/shared';
+import type { RuleCondition } from '@busybirdies/shared';
 import { getLogger } from '../lib/logger.js';
 
 /**

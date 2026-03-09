@@ -1,4 +1,4 @@
-import type { ErrorResponse } from '@supportdesk/shared';
+import type { ErrorResponse } from '@busybirdies/shared';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/v1';
 
