@@ -29,7 +29,7 @@ export async function collisionRoutes(app: FastifyInstance): Promise<void> {
    */
   app.post(
     '/tickets/:id/heartbeat',
-    { preHandler: [authenticate, tenantScope, requireRole('admin', 'agent')] },
+    { preHandler: [authenticate, tenantScope] },
     async (request, reply) => {
       const logger = getLogger();
       const { id: ticketId } = ticketIdParamSchema.parse(request.params);
