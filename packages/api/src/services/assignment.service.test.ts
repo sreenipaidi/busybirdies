@@ -80,6 +80,7 @@ describe('Assignment Service', () => {
       await expect(
         assignmentService.createRule(mockTenantId, {
           name: 'Test rule',
+          condition_logic: 'any',
           conditions: [{ field: 'priority', operator: 'equals', value: 'high' }],
           action_type: 'assign_agent',
           is_active: true,
@@ -91,6 +92,7 @@ describe('Assignment Service', () => {
       await expect(
         assignmentService.createRule(mockTenantId, {
           name: 'Test rule',
+          condition_logic: 'any',
           conditions: [{ field: 'priority', operator: 'equals', value: 'high' }],
           action_type: 'assign_group',
           is_active: true,
@@ -105,6 +107,7 @@ describe('Assignment Service', () => {
       await expect(
         assignmentService.createRule(mockTenantId, {
           name: 'Test rule',
+          condition_logic: 'any',
           conditions: [{ field: 'priority', operator: 'equals', value: 'high' }],
           action_type: 'assign_agent',
           target_agent_id: 'nonexistent-agent',
@@ -120,6 +123,7 @@ describe('Assignment Service', () => {
       await expect(
         assignmentService.createRule(mockTenantId, {
           name: 'Test rule',
+          condition_logic: 'any',
           conditions: [{ field: 'priority', operator: 'equals', value: 'high' }],
           action_type: 'assign_agent',
           target_agent_id: mockAgentId,
@@ -135,6 +139,7 @@ describe('Assignment Service', () => {
       await expect(
         assignmentService.createRule(mockTenantId, {
           name: 'Test rule',
+          condition_logic: 'any',
           conditions: [{ field: 'priority', operator: 'equals', value: 'high' }],
           action_type: 'assign_group',
           target_group_id: 'nonexistent-group',

@@ -29,6 +29,7 @@ async function buildRuleResponse(
     name: string;
     isActive: boolean;
     priorityOrder: number;
+    conditionLogic: string | null;
     conditions: unknown;
     actionType: string;
     targetAgentId: string | null;
@@ -93,6 +94,7 @@ async function buildRuleResponse(
     name: row.name,
     is_active: row.isActive,
     priority_order: row.priorityOrder,
+    condition_logic: (row.conditionLogic ?? 'any') as 'all' | 'any',
     conditions: row.conditions as RuleCondition[],
     action_type: row.actionType as AssignmentRule['action_type'],
     target_agent: targetAgent,
@@ -182,6 +184,7 @@ export async function createRule(
       name: input.name,
       isActive: input.is_active ?? true,
       priorityOrder: nextOrder,
+      conditionLogic: input.condition_logic ?? 'any',
       conditions: input.conditions,
       actionType: input.action_type,
       targetAgentId: input.action_type === 'assign_agent' ? input.target_agent_id ?? null : null,
@@ -376,6 +379,7 @@ export async function reorderRules(
  */
 export async function getActiveRules(tenantId: string): Promise<Array<{
   id: string;
+  conditionLogic: string | null;
   conditions: RuleCondition[];
   actionType: string;
   targetAgentId: string | null;
@@ -386,6 +390,7 @@ export async function getActiveRules(tenantId: string): Promise<Array<{
   const rows = await db
     .select({
       id: assignmentRules.id,
+      conditionLogic: assignmentRules.conditionLogic,
       conditions: assignmentRules.conditions,
       actionType: assignmentRules.actionType,
       targetAgentId: assignmentRules.targetAgentId,
@@ -402,6 +407,7 @@ export async function getActiveRules(tenantId: string): Promise<Array<{
 
   return rows.map((row) => ({
     id: row.id,
+    conditionLogic: row.conditionLogic,
     conditions: row.conditions as RuleCondition[],
     actionType: row.actionType,
     targetAgentId: row.targetAgentId,

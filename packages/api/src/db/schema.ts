@@ -118,6 +118,7 @@ export const assignmentRules = pgTable(
     isActive: boolean('is_active').notNull().default(true),
     priorityOrder: integer('priority_order').notNull(),
     conditions: jsonb('conditions').notNull(),
+    conditionLogic: varchar('condition_logic', { length: 10 }).notNull().default('any'),
     actionType: varchar('action_type', { length: 15 }).notNull(),
     targetAgentId: uuid('target_agent_id').references(() => users.id),
     targetGroupId: uuid('target_group_id').references(() => agentGroups.id),

@@ -7,11 +7,14 @@ export interface RuleCondition {
   value: string;
 }
 
+export type ConditionLogic = 'all' | 'any';
+
 export interface AssignmentRule {
   id: string;
   name: string;
   is_active: boolean;
   priority_order: number;
+  condition_logic: ConditionLogic;  // defaults to 'any'
   conditions: RuleCondition[];
   action_type: RuleActionType;
   target_agent: UserSummary | null;

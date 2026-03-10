@@ -108,6 +108,7 @@ export async function evaluateAndAssign(
   // Evaluate rules using the rule evaluator
   const evalRules = activeRules.map((r) => ({
     id: r.id,
+    condition_logic: r.conditionLogic as 'all' | 'any' | undefined,
     conditions: r.conditions as Array<{ field: RuleCondition['field']; operator: RuleCondition['operator']; value: string }>,
   }));
 

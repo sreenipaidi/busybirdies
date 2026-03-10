@@ -14,6 +14,7 @@ export interface EvalCondition {
  */
 export interface EvalRule {
   id: string;
+  condition_logic?: 'all' | 'any';
   conditions: EvalCondition[];
 }
 
@@ -97,7 +98,12 @@ export function evaluateRule(
   if (rule.conditions.length === 0) {
     return false;
   }
-  return rule.conditions.every((condition) => evaluateCondition(condition, ticket));
+  // 'any' = OR logic (default), 'all' = AND logic
+  const logic = rule.condition_logic ?? 'any';
+  if (logic === 'all') {
+    return rule.conditions.every((condition) => evaluateCondition(condition, ticket));
+  }
+  return rule.conditions.some((condition) => evaluateCondition(condition, ticket));
 }
 
 /**

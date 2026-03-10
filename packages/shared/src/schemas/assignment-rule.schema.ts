@@ -9,6 +9,7 @@ export const ruleConditionSchema = z.object({
 
 export const createAssignmentRuleSchema = z.object({
   name: z.string().min(1, 'Rule name is required').max(100),
+  condition_logic: z.enum(['all', 'any']).optional().default('any'),
   conditions: z.array(ruleConditionSchema).min(1, 'At least one condition is required'),
   action_type: z.enum(RULE_ACTION_TYPES),
   target_agent_id: z.string().uuid().optional(),

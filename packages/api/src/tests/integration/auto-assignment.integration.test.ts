@@ -76,6 +76,7 @@ function fakeRule(overrides: Partial<AssignmentRule> = {}): AssignmentRule {
     name: 'Route urgent billing to L2',
     is_active: true,
     priority_order: 1,
+    condition_logic: 'any' as const,
     conditions: [
       { field: 'priority', operator: 'equals', value: 'urgent' },
       { field: 'tags', operator: 'includes', value: 'billing' },
@@ -116,6 +117,7 @@ describe('Integration: Auto-Assignment Rules and Ticket Assignment', () => {
           { field: 'priority', operator: 'equals', value: 'urgent' },
           { field: 'tags', operator: 'includes', value: 'billing' },
         ],
+        condition_logic: 'any',
         action_type: 'assign_agent',
         target_agent_id: agentId,
         is_active: true,
@@ -147,6 +149,7 @@ describe('Integration: Auto-Assignment Rules and Ticket Assignment', () => {
       payload: {
         name: 'Route login issues to L1',
         conditions: [{ field: 'subject', operator: 'contains', value: 'login' }],
+        condition_logic: 'any',
         action_type: 'assign_group',
         target_group_id: groupId1,
         is_active: true,
@@ -296,6 +299,7 @@ describe('Integration: Auto-Assignment Rules and Ticket Assignment', () => {
       payload: {
         name: 'Agent trying to create rule',
         conditions: [{ field: 'priority', operator: 'equals', value: 'low' }],
+        condition_logic: 'any',
         action_type: 'assign_agent',
         target_agent_id: agentId,
         is_active: true,

@@ -50,6 +50,7 @@ function RuleForm({ onClose, existing }: RuleFormProps) {
 
   const [name, setName] = useState(existing?.name ?? '');
   const [targetAgentId, setTargetAgentId] = useState(existing?.target_agent?.id ?? '');
+  const [conditionLogic, setConditionLogic] = useState<'all' | 'any'>(existing?.condition_logic ?? 'any');
   const [conditions, setConditions] = useState<Condition[]>(
     existing?.conditions ?? [{ field: 'priority', operator: 'equals', value: 'low' }]
   );
@@ -86,6 +87,7 @@ function RuleForm({ onClose, existing }: RuleFormProps) {
 
     const payload = {
       name: name.trim(),
+      condition_logic: conditionLogic,
       conditions,
       action_type: 'assign_agent' as const,
       target_agent_id: targetAgentId,
@@ -144,6 +146,30 @@ function RuleForm({ onClose, existing }: RuleFormProps) {
                 + Add condition
               </button>
             </div>
+
+            {conditions.length > 1 && (
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs text-text-secondary">Match</span>
+                <div className="flex rounded-md border border-border overflow-hidden text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setConditionLogic('any')}
+                    className={`px-3 py-1 ${conditionLogic === 'any' ? 'bg-primary text-white' : 'bg-surface text-text-secondary hover:bg-surface-alt'}`}
+                  >
+                    ANY (OR)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConditionLogic('all')}
+                    className={`px-3 py-1 ${conditionLogic === 'all' ? 'bg-primary text-white' : 'bg-surface text-text-secondary hover:bg-surface-alt'}`}
+                  >
+                    ALL (AND)
+                  </button>
+                </div>
+                <span className="text-xs text-text-secondary">of the following conditions</span>
+              </div>
+            )}
+
             <div className="space-y-3">
               {conditions.map((condition, index) => (
                 <div key={index} className="flex gap-2 items-start">
@@ -262,7 +288,12 @@ function RuleCard({ rule, onEdit }: { rule: AssignmentRule; onEdit: () => void }
           </div>
 
           {/* Conditions */}
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-2 mb-2 items-center">
+            {rule.conditions.length > 1 && (
+              <span className="text-xs font-bold text-text-secondary uppercase">
+                {rule.condition_logic === 'all' ? 'ALL' : 'ANY'}
+              </span>
+            )}
             {rule.conditions.map((c, i) => (
               <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary rounded text-xs">
                 <span className="font-medium">{c.field}</span>
