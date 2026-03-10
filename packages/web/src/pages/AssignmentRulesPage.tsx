@@ -51,7 +51,7 @@ function RuleForm({ onClose, existing }: RuleFormProps) {
   const [name, setName] = useState(existing?.name ?? '');
   const [targetAgentId, setTargetAgentId] = useState(existing?.target_agent?.id ?? '');
   const [conditions, setConditions] = useState<Condition[]>(
-    existing?.conditions ?? [{ field: 'priority', operator: 'equals', value: '' }]
+    existing?.conditions ?? [{ field: 'priority', operator: 'equals', value: 'low' }]
   );
 
   const agentOptions = [
@@ -72,7 +72,7 @@ function RuleForm({ onClose, existing }: RuleFormProps) {
         const updated = { ...c, [key]: val };
         if (key === 'field') {
           updated.operator = OPERATOR_OPTIONS[val]?.[0]?.value ?? 'equals';
-          updated.value = '';
+          updated.value = val === 'priority' ? 'low' : '';
         }
         return updated;
       })
