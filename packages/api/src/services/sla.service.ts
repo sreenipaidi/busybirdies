@@ -121,6 +121,31 @@ export async function updatePolicy(
     'SLA policy updated',
   );
 
+  // Recalculate SLA deadlines for all open tickets of this priority
+  try {
+    const openTickets = await db
+      .select({ id: tickets.id, createdAt: tickets.createdAt })
+      .from(tickets)
+      .where(
+        and(
+          eq(tickets.tenantId, tenantId),
+          eq(tickets.priority, updated.priority),
+          eq(tickets.status, 'open'),
+        ),
+      );
+
+    logger.info(
+      { tenantId, priority: updated.priority, count: openTickets.length },
+      'Recalculating SLA deadlines for open tickets after policy update',
+    );
+
+    for (const ticket of openTickets) {
+      await calculateAndSetDeadlines(tenantId, ticket.id, updated.priority, ticket.createdAt);
+    }
+  } catch (err) {
+    logger.error({ err, tenantId, policyId }, 'Failed to recalculate SLA deadlines after policy update');
+  }
+
   return toSLAPolicy(updated);
 }
 
