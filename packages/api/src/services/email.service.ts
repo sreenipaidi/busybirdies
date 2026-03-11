@@ -579,6 +579,37 @@ export function renderVerificationEmail(params: {
 }
 
 /**
+ * Render the password reset email template.
+ */
+export function renderPasswordResetEmail(params: {
+  fullName: string;
+  resetUrl: string;
+  tenantName: string;
+}): { subject: string; html: string } {
+  const safeName = escapeHtml(params.fullName);
+  const safeUrl = escapeHtml(params.resetUrl);
+  const safeTenantName = escapeHtml(params.tenantName);
+
+  return {
+    subject: `Reset your password - ${params.tenantName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Reset your password</h2>
+        <p>Hi ${safeName},</p>
+        <p>We received a request to reset your password for your ${safeTenantName} account. Click the button below to choose a new password:</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="${safeUrl}" style="background: #2563EB; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+            Reset Password
+          </a>
+        </p>
+        <p style="color: #666; font-size: 14px;">This link expires in 1 hour. If you did not request a password reset, you can safely ignore this email.</p>
+        <p style="color: #666; font-size: 12px;">Or copy this link: ${safeUrl}</p>
+      </div>
+    `.trim(),
+  };
+}
+
+/**
  * Send an email via SendGrid if API key is configured, otherwise log (dev mode).
  */
 export async function sendEmail(

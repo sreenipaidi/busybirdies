@@ -12,7 +12,7 @@ import {
   NotFoundError,
 } from '../lib/errors.js';
 import { SLA_DEFAULTS } from '@busybirdies/shared';
-import { sendEmail, renderVerificationEmail } from './email.service.js';
+import { sendEmail, renderVerificationEmail, renderPasswordResetEmail } from './email.service.js';
 import { getLogger } from '../lib/logger.js';
 import type { UserRole } from '@busybirdies/shared';
 import type { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from '@busybirdies/shared';
@@ -404,7 +404,16 @@ export async function forgotPassword(
       })
       .where(eq(users.id, user.id));
 
-    // TODO: Dispatch password reset email via email service / job queue
+    const [tenantRow] = await db.select({ name: tenants.name, subdomain: tenants.subdomain }).from(tenants).where(eq(tenants.id, tenant.id)).limit(1);
+    const [userRow] = await db.select({ fullName: users.fullName }).from(users).where(eq(users.id, user.id)).limit(1);
+    const config = getConfig();
+    const resetUrl = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const { subject, html } = renderPasswordResetEmail({
+      fullName: userRow?.fullName ?? 'there',
+      resetUrl,
+      tenantName: tenantRow?.name ?? 'Support',
+    });
+    await sendEmail(input.email, subject, html);
   }
 
   return {

@@ -10,6 +10,7 @@ import { ApiError } from '../api/client.js';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
+  portal: z.string().min(1, 'Portal subdomain is required.'),
 });
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -26,14 +27,14 @@ export function ForgotPasswordPage() {
     formState: { errors },
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: '' },
+    defaultValues: { email: '', portal: '' },
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setServerError(null);
     setIsSubmitting(true);
     try {
-      await forgotPassword(data.email);
+      await forgotPassword(data.email, data.portal);
       setIsSuccess(true);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -106,6 +107,15 @@ export function ForgotPasswordPage() {
           error={errors.email?.message}
           disabled={isSubmitting}
           {...register('email')}
+        />
+
+        <Input
+          label="Portal subdomain"
+          type="text"
+          placeholder="e.g. acme"
+          error={errors.portal?.message}
+          disabled={isSubmitting}
+          {...register('portal')}
         />
 
         <Button

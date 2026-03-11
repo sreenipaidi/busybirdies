@@ -112,8 +112,8 @@ export function useAuth() {
     navigate('/login');
   }, [clearAuth, navigate]);
 
-  const forgotPassword = useCallback(async (email: string) => {
-    await api.post(ENDPOINTS.auth.forgotPassword, { email });
+  const forgotPassword = useCallback(async (email: string, portal: string) => {
+    await api.post(ENDPOINTS.auth.forgotPassword, { email, portal });
   }, []);
 
   const resetPassword = useCallback(
