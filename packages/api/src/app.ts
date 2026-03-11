@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import cookie from '@fastify/cookie';
+import multipart from '@fastify/multipart';
 import { getConfig } from './config.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { authRoutes } from './routes/auth.routes.js';
@@ -45,6 +46,7 @@ export async function buildApp() {
     credentials: true,
   });
   await app.register(cookie);
+  await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024, files: 5 } }); // 10MB per file, max 5 files
 
   // Register request-id middleware to set X-Request-Id on all responses
   registerRequestId(app);

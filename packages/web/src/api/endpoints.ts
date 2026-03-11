@@ -23,10 +23,11 @@ export const ENDPOINTS = {
     list: '/tickets',
     create: '/tickets',
     detail: (id: string) => `/tickets/${id}`,
+    attachments: (id: string) => `/tickets/${id}/attachments`,
+    downloadAttachment: (ticketId: string, attachmentId: string) => `/tickets/${ticketId}/attachments/${attachmentId}/download`,
     replies: (id: string) => `/tickets/${id}/replies`,
     audit: (id: string) => `/tickets/${id}/audit`,
     heartbeat: (id: string) => `/tickets/${id}/heartbeat`,
-    attachments: (id: string) => `/tickets/${id}/attachments`,
   },
   assignmentRules: {
     list: '/assignment-rules',

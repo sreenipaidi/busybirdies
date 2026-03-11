@@ -8,6 +8,10 @@ import {
 } from '@busybirdies/shared';
 import * as ticketService from '../services/ticket.service.js';
 import * as replyService from '../services/reply.service.js';
+import * as fileStorage from '../services/file-storage.service.js';
+import { getDb } from '../db/connection.js';
+import { ticketAttachments, tickets as ticketsTable } from '../db/schema.js';
+import { eq, and } from 'drizzle-orm';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { tenantScope } from '../middleware/tenant.middleware.js';
 import { requireRole } from '../middleware/role.middleware.js';
@@ -206,4 +210,98 @@ export async function ticketRoutes(app: FastifyInstance): Promise<void> {
       return reply.status(200).send(ticket);
     },
   );
+
+  /**
+   * POST /v1/tickets/:id/attachments
+   * Upload one or more files attached to a ticket (or reply).
+   */
+  app.post(
+    '/tickets/:id/attachments',
+    { preHandler: [authenticate, tenantScope] },
+    async (request, reply) => {
+      const { id: ticketId } = request.params as { id: string };
+      const user = request.user!;
+      const db = getDb();
+
+      // Verify ticket belongs to tenant
+      const [ticket] = await db
+        .select({ id: ticketsTable.id })
+        .from(ticketsTable)
+        .where(and(eq(ticketsTable.id, ticketId), eq(ticketsTable.tenantId, request.tenantId!)))
+        .limit(1);
+
+      if (!ticket) {
+        return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Ticket not found' } });
+      }
+
+      const parts = request.parts();
+      const saved: Array<{
+        id: string;
+        file_name: string;
+        file_size: number;
+        mime_type: string;
+        created_at: string;
+      }> = [];
+
+      const replyIdHeader = (request.headers as Record<string, string>)['x-reply-id'] ?? null;
+
+      for await (const part of parts) {
+        if (part.type !== 'file') continue;
+        const stored = await fileStorage.uploadFile(request.tenantId!, ticketId, part);
+        const [inserted] = await db
+          .insert(ticketAttachments)
+          .values({
+            ticketId,
+            replyId: replyIdHeader,
+            fileName: stored.fileName,
+            fileSize: stored.fileSize,
+            mimeType: stored.mimeType,
+            storageKey: stored.storageKey,
+            uploadedById: user.id,
+          })
+          .returning();
+
+        if (inserted) {
+          saved.push({
+            id: inserted.id,
+            file_name: inserted.fileName,
+            file_size: inserted.fileSize,
+            mime_type: inserted.mimeType,
+            created_at: inserted.createdAt.toISOString(),
+          });
+        }
+      }
+
+      return reply.status(201).send({ data: saved });
+    },
+  );
+
+  /**
+   * GET /v1/tickets/:id/attachments/:attachmentId/download
+   * Download an attachment file.
+   */
+  app.get(
+    '/tickets/:id/attachments/:attachmentId/download',
+    { preHandler: [authenticate, tenantScope] },
+    async (request, reply) => {
+      const { id: ticketId, attachmentId } = request.params as { id: string; attachmentId: string };
+      const db = getDb();
+
+      const [attachment] = await db
+        .select()
+        .from(ticketAttachments)
+        .where(and(eq(ticketAttachments.id, attachmentId), eq(ticketAttachments.ticketId, ticketId)))
+        .limit(1);
+
+      if (!attachment) {
+        return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Attachment not found' } });
+      }
+
+      const stream = fileStorage.getFileStream(attachment.storageKey);
+      reply.header('Content-Type', attachment.mimeType);
+      reply.header('Content-Disposition', `attachment; filename="${attachment.fileName}"`);
+      return reply.send(stream);
+    },
+  );
+
 }
