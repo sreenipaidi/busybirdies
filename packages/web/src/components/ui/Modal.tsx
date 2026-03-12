@@ -54,13 +54,21 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
     [onClose],
   );
 
+  // Attach/detach keydown listener whenever handleKeyDown changes
+  useEffect(() => {
+    if (!isOpen) return;
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, handleKeyDown]);
+
+  // Focus first input only once when modal opens; restore focus on close
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement;
-      document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
 
-      // Focus first input/select/textarea, falling back to first focusable (but not the close button)
       requestAnimationFrame(() => {
         const firstInput = contentRef.current?.querySelector(
           'input, select, textarea',
@@ -74,16 +82,13 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
           firstFocusable?.focus();
         }
       });
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+    } else {
       document.body.style.overflow = '';
       if (previousActiveElement.current instanceof HTMLElement) {
         previousActiveElement.current.focus();
       }
-    };
-  }, [isOpen, handleKeyDown]);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
