@@ -16,6 +16,8 @@ import {
   AuthorizationError,
 } from '../lib/errors.js';
 import { getLogger } from '../lib/logger.js';
+import { getConfig } from '../config.js';
+import { notifySlackNewTicket } from './slack.service.js';
 import { VALID_STATUS_TRANSITIONS } from '@busybirdies/shared';
 import type {
   TicketStatus,
@@ -351,6 +353,16 @@ export async function createTicket(
       logger.error({ err, tenantId, ticketId: ticket.id }, 'Failed to auto-assign ticket');
     }
   }
+
+  // Notify Slack for high/urgent tickets (fire and forget)
+  void notifySlackNewTicket(tenantId, {
+    ticketNumber: ticket.ticketNumber,
+    subject: ticket.subject,
+    priority: ticket.priority,
+    status: ticket.status,
+    createdBy: createdBy.id,
+    ticketUrl: `${getConfig().FRONTEND_URL}/tickets/${ticket.id}`,
+  });
 
   // Re-fetch the ticket to include any SLA/assignment updates
   const [finalTicket] = await db

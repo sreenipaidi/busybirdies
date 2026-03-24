@@ -47,6 +47,10 @@ export const ENDPOINTS = {
     list: '/sla-policies',
     detail: (id: string) => `/sla-policies/${id}`,
   },
+  integrations: {
+    slack: '/integrations/slack',
+    slackTest: '/integrations/slack/test',
+  },
   cannedResponses: {
     list: '/canned-responses',
     create: '/canned-responses',

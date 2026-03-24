@@ -17,6 +17,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage.js';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.js';
 import { NotFoundPage } from './pages/NotFoundPage.js';
 import { PlaceholderPage } from './pages/PlaceholderPage.js';
+import { IntegrationsPage } from './pages/IntegrationsPage.js';
 import { CannedResponsesPage } from './pages/CannedResponsesPage.js';
 import { SLAPoliciesPage } from './pages/SLAPoliciesPage.js';
 import { AssignmentRulesPage } from './pages/AssignmentRulesPage.js';
@@ -128,6 +129,7 @@ export function App() {
             <Route path="/admin/assignment-rules" element={<AssignmentRulesPage />} />
             <Route path="/admin/sla-policies" element={<SLAPoliciesPage />} />
             <Route path="/admin/canned-responses" element={<CannedResponsesPage adminView />} />
+            <Route path="/admin/integrations" element={<IntegrationsPage />} />
             <Route path="/admin/branding" element={<PlaceholderPage title="Branding" />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
             <Route path="/reports" element={<ReportsPage />} />

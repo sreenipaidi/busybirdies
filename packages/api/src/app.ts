@@ -16,6 +16,7 @@ import { reportRoutes } from './routes/reports.routes.js';
 import { csatRoutes } from './routes/csat.routes.js';
 import { collisionRoutes } from './routes/collision.routes.js';
 import { webhookRoutes } from './routes/webhooks.routes.js';
+import { integrationRoutes } from './routes/integrations.routes.js';
 import { agentGroupRoutes } from './routes/agent-groups.routes.js';
 import { tenantRoutes } from './routes/tenant.routes.js';
 import { registerErrorHandler } from './middleware/error-handler.middleware.js';
@@ -74,6 +75,7 @@ export async function buildApp() {
 
   // Webhook routes -- no auth required (secured by webhook signature verification)
   await app.register(webhookRoutes, { prefix: '/v1' });
+  await app.register(integrationRoutes, { prefix: '/v1' });
 
   return app;
 }

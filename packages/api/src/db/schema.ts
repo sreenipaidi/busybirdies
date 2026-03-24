@@ -388,3 +388,17 @@ export const ticketViewHeartbeats = pgTable(
     index('idx_heartbeat_ticket_seen').on(table.ticketId, table.lastSeenAt),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// Tenant Integrations
+// ---------------------------------------------------------------------------
+
+export const tenantIntegrations = pgTable('tenant_integrations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull().references(() => tenants.id, { onDelete: 'cascade' }),
+  type: varchar('type', { length: 50 }).notNull(), // 'slack'
+  config: jsonb('config').notNull().default('{}'), // { webhookUrl, channel, notifyOnPriorities }
+  enabled: boolean('enabled').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
