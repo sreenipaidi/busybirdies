@@ -355,12 +355,13 @@ export async function createTicket(
   }
 
   // Notify Slack for high/urgent tickets (fire and forget)
+  const createdByUser = await findUser(tenantId, createdBy.id);
   void notifySlackNewTicket(tenantId, {
     ticketNumber: ticket.ticketNumber,
     subject: ticket.subject,
     priority: ticket.priority,
     status: ticket.status,
-    createdBy: createdBy.id,
+    createdBy: createdByUser?.fullName ?? createdBy.id,
     ticketUrl: `${getConfig().FRONTEND_URL}/tickets/${ticket.id}`,
   });
 
