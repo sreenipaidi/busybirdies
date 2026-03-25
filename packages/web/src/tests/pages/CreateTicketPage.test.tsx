@@ -137,6 +137,9 @@ describe('CreateTicketPage', () => {
       created_by: { id: 'a-1', full_name: 'Agent', email: 'a@test.com', role: 'agent' },
       assigned_agent: null,
       source: 'agent',
+      
+      jira_issue_key: null,
+      jira_issue_url: null,
       sla_first_response_due: null,
       sla_resolution_due: null,
       sla_first_response_met: null,

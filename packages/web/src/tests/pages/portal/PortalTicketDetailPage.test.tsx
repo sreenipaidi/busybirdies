@@ -47,6 +47,9 @@ const mockTicket: Ticket = {
   assigned_agent: { id: 'a-1', full_name: 'Marcus Lee', email: 'marcus@acme.com', role: 'agent' },
   tags: ['dashboard', 'login'],
   source: 'portal',
+  
+  jira_issue_key: null,
+  jira_issue_url: null,
   sla_first_response_due: '2026-03-04T15:30:00Z',
   sla_resolution_due: '2026-03-04T22:30:00Z',
   sla_first_response_met: null,
@@ -229,6 +232,9 @@ describe('PortalTicketDetailPage', () => {
       body: 'Thank you!',
       is_internal: false,
       source: 'portal',
+      
+      jira_issue_key: null,
+      jira_issue_url: null,
       attachments: [],
       created_at: '2026-03-04T16:00:00Z',
     });

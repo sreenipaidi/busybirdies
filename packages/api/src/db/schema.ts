@@ -163,6 +163,8 @@ export const tickets = pgTable(
     resolvedAt: timestamp('resolved_at', { withTimezone: true }),
     closedAt: timestamp('closed_at', { withTimezone: true }),
     source: varchar('source', { length: 10 }).notNull().default('portal'),
+  jiraIssueKey: varchar('jira_issue_key', { length: 50 }),
+  jiraIssueUrl: text('jira_issue_url'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

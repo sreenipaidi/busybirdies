@@ -50,6 +50,8 @@ export const ENDPOINTS = {
   integrations: {
     slack: '/integrations/slack',
     slackTest: '/integrations/slack/test',
+    jira: '/integrations/jira',
+    jiraTest: '/integrations/jira/test',
   },
   cannedResponses: {
     list: '/canned-responses',

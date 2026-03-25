@@ -187,6 +187,8 @@ describe('Integration: Auto-Assignment Rules and Ticket Assignment', () => {
       assigned_agent: agentSummary,
       tags: ['billing'],
       source: 'portal',
+      jira_issue_key: null,
+      jira_issue_url: null,
       sla_first_response_due: '2026-03-04T15:00:00Z',
       sla_resolution_due: '2026-03-04T18:30:00Z',
       sla_first_response_met: null,

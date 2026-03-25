@@ -79,6 +79,9 @@ const mockCreatedTicket: Ticket = {
   assigned_agent: null,
   tags: [],
   source: 'portal',
+  
+  jira_issue_key: null,
+  jira_issue_url: null,
   sla_first_response_due: null,
   sla_resolution_due: null,
   sla_first_response_met: null,

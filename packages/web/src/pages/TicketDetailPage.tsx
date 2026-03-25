@@ -317,6 +317,27 @@ export function TicketDetailPage() {
         </p>
       </div>
 
+      {/* Jira */}
+      {ticket.jira_issue_key && ticket.jira_issue_url && (
+        <div>
+          <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
+            Jira Issue
+          </p>
+          <a
+            href={ticket.jira_issue_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+          >
+            <svg viewBox="0 0 32 32" className="w-4 h-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="#0052CC">
+              <path d="M15.947 0C11.595 8.125 13.279 13.379 16.842 16.855L24.21 24.1C19.832 28.425 13.198 29.902 7.354 27.565L0 32C8.524 37.694 19.868 36.545 27.14 29.364L32 24.558 17.02.587z"/>
+              <path d="M16.053 32C20.405 23.875 18.721 18.621 15.158 15.145L7.79 7.9C12.168 3.575 18.802 2.098 24.646 4.435L32 0C23.476-5.694 12.132-4.545 4.86 2.636L0 7.442 14.98 31.413z" opacity="0.5"/>
+            </svg>
+            {ticket.jira_issue_key}
+          </a>
+        </div>
+      )}
+
       {/* Audit Trail */}
       {auditTrail.length > 0 && (
         <div>

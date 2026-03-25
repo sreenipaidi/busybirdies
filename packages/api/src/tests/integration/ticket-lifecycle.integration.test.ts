@@ -69,6 +69,8 @@ function fakeTicket(overrides: Partial<Ticket> = {}): Ticket {
     assigned_agent: null,
     tags: ['billing'],
     source: 'portal',
+    jira_issue_key: null,
+    jira_issue_url: null,
     sla_first_response_due: '2026-03-04T15:30:00Z',
     sla_resolution_due: '2026-03-04T22:30:00Z',
     sla_first_response_met: null,

@@ -7,6 +7,15 @@ import { api } from '../api/client.js';
 import { ENDPOINTS } from '../api/endpoints.js';
 import { useUIStore } from '../stores/ui.store.js';
 
+interface JiraConfig {
+  enabled: boolean;
+  baseUrl: string;
+  email: string;
+  apiToken: string;
+  projectKey: string;
+  issueType: string;
+}
+
 interface SlackConfig {
   enabled: boolean;
   webhookUrl: string;
@@ -169,6 +178,148 @@ export function IntegrationsPage() {
           </div>
         </div>
       </Card>
+
+      {/* Jira Integration */}
+      <Card className="mt-6">
+        <JiraIntegration />
+      </Card>
+    </div>
+  );
+}
+
+function JiraIntegration() {
+  const addToast = useUIStore((s) => s.addToast);
+
+  const { data, isLoading, refetch } = useQuery<JiraConfig>({
+    queryKey: ['integrations', 'jira'],
+    queryFn: () => api.get<JiraConfig>(ENDPOINTS.integrations.jira),
+  });
+
+  const [form, setForm] = useState<JiraConfig | null>(null);
+  const config = form ?? data ?? { enabled: false, baseUrl: '', email: '', apiToken: '', projectKey: '', issueType: 'Task' };
+
+  const saveMutation = useMutation({
+    mutationFn: (payload: JiraConfig) => api.put<JiraConfig>(ENDPOINTS.integrations.jira, payload),
+    onSuccess: () => {
+      addToast({ type: 'success', message: 'Jira integration saved.' });
+      void refetch();
+      setForm(null);
+    },
+    onError: () => addToast({ type: 'error', message: 'Failed to save Jira integration.' }),
+  });
+
+  const testMutation = useMutation({
+    mutationFn: () => api.post<{ message: string; url: string }>(ENDPOINTS.integrations.jiraTest, {}),
+    onSuccess: (data) => addToast({ type: 'success', message: data.message }),
+    onError: () => addToast({ type: 'error', message: 'Test failed. Check your Jira configuration.' }),
+  });
+
+  const update = (patch: Partial<JiraConfig>) => setForm((prev) => ({ ...config, ...prev, ...patch }));
+  const isDirty = form !== null;
+
+  return (
+    <div className="flex items-start gap-4">
+      {/* Jira logo */}
+      <div className="shrink-0 w-12 h-12 rounded-xl bg-[#0052CC] flex items-center justify-center">
+        <svg viewBox="0 0 32 32" className="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15.947 0C11.595 8.125 13.279 13.379 16.842 16.855L24.21 24.1C19.832 28.425 13.198 29.902 7.354 27.565L0 32C8.524 37.694 19.868 36.545 27.14 29.364L32 24.558 17.02.587z" fill="white"/>
+          <path d="M16.053 32C20.405 23.875 18.721 18.621 15.158 15.145L7.79 7.9C12.168 3.575 18.802 2.098 24.646 4.435L32 0C23.476-5.694 12.132-4.545 4.86 2.636L0 7.442 14.98 31.413z" fill="white" opacity="0.5"/>
+        </svg>
+      </div>
+
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-text-primary">Jira</h2>
+            <p className="text-sm text-text-secondary">Automatically create a Jira issue for every new support ticket.</p>
+          </div>
+          <div
+            onClick={() => update({ enabled: !config.enabled })}
+            className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${config.enabled ? 'bg-primary' : 'bg-border'}`}
+          >
+            <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${config.enabled ? 'translate-x-5' : 'translate-x-0'}`} />
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1">Jira Base URL</label>
+            <Input
+              value={config.baseUrl}
+              onChange={(e) => update({ baseUrl: e.target.value })}
+              placeholder="https://yourcompany.atlassian.net"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Atlassian Email</label>
+              <Input
+                value={config.email}
+                onChange={(e) => update({ email: e.target.value })}
+                placeholder="you@company.com"
+                disabled={isLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">API Token</label>
+              <Input
+                value={config.apiToken}
+                onChange={(e) => update({ apiToken: e.target.value })}
+                placeholder="Your Atlassian API token"
+                type="password"
+                disabled={isLoading}
+              />
+              <p className="text-xs text-text-secondary mt-1">
+                Generate at <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">id.atlassian.com</a>
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Project Key</label>
+              <Input
+                value={config.projectKey}
+                onChange={(e) => update({ projectKey: e.target.value.toUpperCase() })}
+                placeholder="e.g. SUP"
+                disabled={isLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Issue Type</label>
+              <Input
+                value={config.issueType}
+                onChange={(e) => update({ issueType: e.target.value })}
+                placeholder="e.g. Task, Bug, Story"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-6">
+          <Button
+            onClick={() => saveMutation.mutate(config)}
+            isLoading={saveMutation.isPending}
+            disabled={!isDirty || saveMutation.isPending}
+          >
+            Save
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => testMutation.mutate()}
+            isLoading={testMutation.isPending}
+            disabled={!config.baseUrl || !config.projectKey || testMutation.isPending}
+          >
+            Create Test Issue
+          </Button>
+          {isDirty && (
+            <Button variant="secondary" onClick={() => setForm(null)} disabled={saveMutation.isPending}>
+              Cancel
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

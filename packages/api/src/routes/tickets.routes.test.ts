@@ -73,6 +73,8 @@ function fakeTicket(overrides: Record<string, unknown> = {}) {
     assigned_agent: null as UserSummary | null,
     tags: [] as string[],
     source: 'portal' as TicketSource,
+    jira_issue_key: null,
+    jira_issue_url: null,
     sla_first_response_due: null,
     sla_resolution_due: null,
     sla_first_response_met: null,

@@ -13,6 +13,8 @@ export interface Ticket {
   assigned_agent: UserSummary | null;
   tags: string[];
   source: TicketSource;
+  jira_issue_key: string | null;
+  jira_issue_url: string | null;
   sla_first_response_due: string | null;
   sla_resolution_due: string | null;
   sla_first_response_met: boolean | null;

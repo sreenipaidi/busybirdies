@@ -18,6 +18,7 @@ import {
 import { getLogger } from '../lib/logger.js';
 import { getConfig } from '../config.js';
 import { notifySlackNewTicket } from './slack.service.js';
+import { syncTicketToJira } from './jira.service.js';
 import { VALID_STATUS_TRANSITIONS } from '@busybirdies/shared';
 import type {
   TicketStatus,
@@ -178,6 +179,8 @@ async function buildTicketResponse(
     createdById: string;
     assignedAgentId: string | null;
     source: string;
+    jiraIssueKey?: string | null;
+    jiraIssueUrl?: string | null;
     slaFirstResponseDue: Date | null;
     slaResolutionDue: Date | null;
     slaFirstResponseMet: boolean | null;
@@ -208,6 +211,8 @@ async function buildTicketResponse(
     assigned_agent: assignedAgent ? toUserSummary(assignedAgent) : null,
     tags,
     source: ticketRow.source as TicketSource,
+    jira_issue_key: ticketRow.jiraIssueKey ?? null,
+    jira_issue_url: ticketRow.jiraIssueUrl ?? null,
     sla_first_response_due: ticketRow.slaFirstResponseDue?.toISOString() ?? null,
     sla_resolution_due: ticketRow.slaResolutionDue?.toISOString() ?? null,
     sla_first_response_met: ticketRow.slaFirstResponseMet ?? null,
@@ -363,6 +368,14 @@ export async function createTicket(
     status: ticket.status,
     createdBy: createdByUser?.fullName ?? createdBy.id,
     ticketUrl: `${getConfig().FRONTEND_URL}/tickets/${ticket.id}`,
+  });
+
+  // Sync to Jira (fire and forget)
+  void syncTicketToJira(tenantId, ticket.id, {
+    ticketNumber: ticket.ticketNumber,
+    subject: ticket.subject,
+    description: ticket.description ?? '',
+    priority: ticket.priority,
   });
 
   // Re-fetch the ticket to include any SLA/assignment updates

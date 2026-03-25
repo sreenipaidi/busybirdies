@@ -42,6 +42,9 @@ const mockTicketDetail = {
     assigned_agent: { id: 'a-1', full_name: 'Marcus Lee', email: 'marcus@acme.com', role: 'agent' },
     tags: ['billing', 'login'],
     source: 'portal',
+    
+    jira_issue_key: null,
+    jira_issue_url: null,
     sla_first_response_due: '2026-03-04T15:30:00Z',
     sla_resolution_due: '2026-03-04T22:30:00Z',
     sla_first_response_met: null,
@@ -60,6 +63,9 @@ const mockTicketDetail = {
       body: 'Hi Jane, thanks for reporting this. Our billing portal had a brief outage.',
       is_internal: false,
       source: 'agent_ui',
+      
+      jira_issue_key: null,
+      jira_issue_url: null,
       attachments: [],
       created_at: '2026-03-04T15:05:00Z',
     },
@@ -70,6 +76,9 @@ const mockTicketDetail = {
       body: 'Checked the logs - billing service went down at 1:50 PM.',
       is_internal: true,
       source: 'agent_ui',
+      
+      jira_issue_key: null,
+      jira_issue_url: null,
       attachments: [],
       created_at: '2026-03-04T14:50:00Z',
     },
@@ -335,6 +344,9 @@ describe('TicketDetailPage', () => {
       body: 'Test reply',
       is_internal: false,
       source: 'agent_ui',
+      
+      jira_issue_key: null,
+      jira_issue_url: null,
       attachments: [],
       created_at: '2026-03-04T16:00:00Z',
     });
