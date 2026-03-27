@@ -211,7 +211,7 @@ function JiraIntegration() {
   const testMutation = useMutation({
     mutationFn: () => api.post<{ message: string; url: string }>(ENDPOINTS.integrations.jiraTest, {}),
     onSuccess: (data) => addToast({ type: 'success', message: data.message }),
-    onError: () => addToast({ type: 'error', message: 'Test failed. Check your Jira configuration.' }),
+    onError: (err: Error) => addToast({ type: 'error', message: err.message || 'Test failed. Check your Jira configuration.' }),
   });
 
   const update = (patch: Partial<JiraConfig>) => setForm((prev) => ({ ...config, ...prev, ...patch }));

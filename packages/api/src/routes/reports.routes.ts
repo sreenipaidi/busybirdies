@@ -43,6 +43,21 @@ export async function reportRoutes(app: FastifyInstance): Promise<void> {
   );
 
   /**
+   * GET /v1/reports/team
+   * Per-agent metrics for all agents in the tenant.
+   */
+  app.get(
+    '/reports/team',
+    { preHandler: [authenticate, tenantScope, requireRole('admin')] },
+    async (request, reply) => {
+      const query = dashboardQuerySchema.parse(request.query);
+      const dateRange = reportService.buildDateRange(query.date_from, query.date_to);
+      const metrics = await reportService.getTeamMetrics(request.tenantId!, dateRange);
+      return reply.status(200).send(metrics);
+    },
+  );
+
+  /**
    * GET /v1/reports/agent/:id
    * Per-agent performance metrics.
    * Admins can view any agent. Agents can only view their own metrics.

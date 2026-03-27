@@ -79,6 +79,10 @@ describe('Report service', () => {
         open_tickets_by_agent: [
           { agent_id: 'a1', agent_name: 'Marcus Lee', count: 14 },
         ],
+        tickets_by_status: [{ status: 'open', count: 14 }],
+        tickets_by_priority: [{ priority: 'high', count: 5 }],
+        sla_by_day: [{ date: '2026-02-02', first_response_rate: 0.9, resolution_rate: 0.8 }],
+        csat_distribution: [{ score: 5, count: 10 }],
         sla_compliance: {
           first_response_rate: 0.89,
           resolution_rate: 0.82,

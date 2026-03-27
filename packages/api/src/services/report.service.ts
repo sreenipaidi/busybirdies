@@ -44,6 +44,18 @@ export interface CSATSummary {
   by_day: CSATDayAverage[];
 }
 
+/** Ticket count by status. */
+export interface StatusCount { status: string; count: number; }
+
+/** Ticket count by priority. */
+export interface PriorityCount { priority: string; count: number; }
+
+/** SLA compliance by day. */
+export interface SLADayCompliance { date: string; first_response_rate: number; resolution_rate: number; }
+
+/** CSAT score distribution. */
+export interface CSATDistribution { score: number; count: number; }
+
 /** Full dashboard metrics response. */
 export interface DashboardMetrics {
   period: { from: string; to: string };
@@ -54,7 +66,11 @@ export interface DashboardMetrics {
   avg_first_response_minutes: number;
   avg_resolution_minutes: number;
   open_tickets_by_agent: AgentTicketCount[];
+  tickets_by_status: StatusCount[];
+  tickets_by_priority: PriorityCount[];
   sla_compliance: SLACompliance;
+  sla_by_day: SLADayCompliance[];
+  csat_distribution: CSATDistribution[];
   csat: CSATSummary;
 }
 
@@ -304,6 +320,50 @@ export async function getDashboardMetrics(
       count: r.count,
     }));
 
+    // 8. Tickets by status
+    const statusRows = await db
+      .select({ status: tickets.status, count: count() })
+      .from(tickets)
+      .where(and(eq(tickets.tenantId, tenantId), gte(tickets.createdAt, dateRange.from), lte(tickets.createdAt, dateRange.to)))
+      .groupBy(tickets.status);
+    const ticketsByStatus: StatusCount[] = statusRows.map((r) => ({ status: r.status, count: r.count }));
+
+    // 9. Tickets by priority
+    const priorityRows = await db
+      .select({ priority: tickets.priority, count: count() })
+      .from(tickets)
+      .where(and(eq(tickets.tenantId, tenantId), gte(tickets.createdAt, dateRange.from), lte(tickets.createdAt, dateRange.to)))
+      .groupBy(tickets.priority);
+    const ticketsByPriority: PriorityCount[] = priorityRows.map((r) => ({ priority: r.priority, count: r.count }));
+
+    // 10. SLA compliance by day
+    const slaByDayRows = await db
+      .select({
+        date: sql<string>`to_char(${tickets.createdAt}::date, 'YYYY-MM-DD')`,
+        total_first: sql<number>`COUNT(*) FILTER (WHERE ${tickets.slaFirstResponseMet} IS NOT NULL)`,
+        met_first: sql<number>`COUNT(*) FILTER (WHERE ${tickets.slaFirstResponseMet} = true)`,
+        total_res: sql<number>`COUNT(*) FILTER (WHERE ${tickets.slaResolutionMet} IS NOT NULL)`,
+        met_res: sql<number>`COUNT(*) FILTER (WHERE ${tickets.slaResolutionMet} = true)`,
+      })
+      .from(tickets)
+      .where(and(eq(tickets.tenantId, tenantId), gte(tickets.createdAt, dateRange.from), lte(tickets.createdAt, dateRange.to)))
+      .groupBy(sql`${tickets.createdAt}::date`)
+      .orderBy(sql`${tickets.createdAt}::date`);
+    const slaByDay: SLADayCompliance[] = slaByDayRows.map((r) => ({
+      date: r.date,
+      first_response_rate: r.total_first > 0 ? Number((r.met_first / r.total_first).toFixed(2)) : 0,
+      resolution_rate: r.total_res > 0 ? Number((r.met_res / r.total_res).toFixed(2)) : 0,
+    }));
+
+    // 11. CSAT score distribution
+    const csatDistRows = await db
+      .select({ score: csatResponses.rating, count: count() })
+      .from(csatResponses)
+      .where(and(eq(csatResponses.tenantId, tenantId), isNotNull(csatResponses.respondedAt), gte(csatResponses.createdAt, dateRange.from), lte(csatResponses.createdAt, dateRange.to)))
+      .groupBy(csatResponses.rating)
+      .orderBy(csatResponses.rating);
+    const csatDistribution: CSATDistribution[] = csatDistRows.map((r) => ({ score: r.score ?? 0, count: r.count }));
+
     return {
       period: {
         from: formatDate(dateRange.from),
@@ -316,10 +376,14 @@ export async function getDashboardMetrics(
       avg_first_response_minutes: avgFirstResponseMinutes,
       avg_resolution_minutes: avgResolutionMinutes,
       open_tickets_by_agent: openTicketsByAgent,
+      tickets_by_status: ticketsByStatus,
+      tickets_by_priority: ticketsByPriority,
       sla_compliance: {
         first_response_rate: Number(firstResponseRate.toFixed(2)),
         resolution_rate: Number(resolutionRate.toFixed(2)),
       },
+      sla_by_day: slaByDay,
+      csat_distribution: csatDistribution,
       csat: {
         average_score: Number(Number(csatAgg?.average_score ?? 0).toFixed(1)),
         response_count: csatResponseCount,
@@ -516,4 +580,55 @@ export async function getAgentMetrics(
     logger.error({ err, tenantId, agentId }, 'Failed to compute agent metrics');
     throw err;
   }
+}
+
+/** Summary metrics for a single agent in the team report. */
+export interface AgentSummaryMetrics {
+  agent_id: string;
+  agent_name: string;
+  tickets_handled: number;
+  avg_first_response_minutes: number;
+  avg_resolution_minutes: number;
+  sla_first_response_rate: number;
+  sla_resolution_rate: number;
+  csat_average: number;
+  tickets_by_status: Record<string, number>;
+}
+
+/**
+ * Get team-wide per-agent metrics for all agents in a tenant.
+ */
+export async function getTeamMetrics(
+  tenantId: string,
+  dateRange: DateRange,
+): Promise<{ agents: AgentSummaryMetrics[]; period: { from: string; to: string } }> {
+  const db = getDb();
+
+  // Get all agents in tenant
+  const agentRows = await db
+    .select({ id: users.id, fullName: users.fullName })
+    .from(users)
+    .where(and(eq(users.tenantId, tenantId), sql`${users.role} IN ('agent', 'admin')`, eq(users.isActive, true)));
+
+  const agents: AgentSummaryMetrics[] = await Promise.all(
+    agentRows.map(async (agent) => {
+      const metrics = await getAgentMetrics(tenantId, agent.id, dateRange);
+      return {
+        agent_id: agent.id,
+        agent_name: agent.fullName,
+        tickets_handled: metrics.tickets_handled,
+        avg_first_response_minutes: metrics.avg_first_response_minutes,
+        avg_resolution_minutes: metrics.avg_resolution_minutes,
+        sla_first_response_rate: metrics.sla_compliance.first_response_rate,
+        sla_resolution_rate: metrics.sla_compliance.resolution_rate,
+        csat_average: metrics.csat_average,
+        tickets_by_status: metrics.tickets_by_status,
+      };
+    })
+  );
+
+  return {
+    agents: agents.sort((a, b) => b.tickets_handled - a.tickets_handled),
+    period: { from: formatDate(dateRange.from), to: formatDate(dateRange.to) },
+  };
 }

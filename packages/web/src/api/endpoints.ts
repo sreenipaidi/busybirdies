@@ -68,6 +68,7 @@ export const ENDPOINTS = {
     search: '/kb/search',
   },
   reports: {
+    team: '/reports/team',
     dashboard: '/reports/dashboard',
     agent: (id: string) => `/reports/agent/${id}`,
   },
