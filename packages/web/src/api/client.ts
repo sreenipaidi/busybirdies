@@ -37,17 +37,26 @@ export async function apiClient<T>(
     headers,
   });
 
-  // Handle 401 by redirecting to login
+  // Handle 401
   if (response.status === 401) {
     const currentPath = window.location.pathname;
-    if (
-      !currentPath.startsWith('/login') &&
-      !currentPath.startsWith('/register') &&
-      !currentPath.startsWith('/forgot-password') &&
-      !currentPath.startsWith('/reset-password')
-    ) {
-      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+    const isAuthPage =
+      currentPath.startsWith('/login') ||
+      currentPath.startsWith('/register') ||
+      currentPath.startsWith('/forgot-password') ||
+      currentPath.startsWith('/reset-password') ||
+      currentPath.startsWith('/portal-login');
+
+    // On auth pages, show the actual error from the API (e.g. wrong credentials)
+    if (isAuthPage) {
+      const errorBody = await response.json().catch(() => ({
+        error: { code: 'UNAUTHORIZED', message: 'Invalid email or password.', request_id: '' },
+      }));
+      throw new ApiError(401, errorBody.error ?? { code: 'UNAUTHORIZED', message: 'Invalid email or password.', request_id: '' });
     }
+
+    // On protected pages, treat as expired session and redirect
+    window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
     throw new ApiError(401, {
       code: 'UNAUTHORIZED',
       message: 'Your session has expired. Please sign in again.',
