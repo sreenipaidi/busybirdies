@@ -41,3 +41,4 @@ packages/api/drizzle/
 # Playwright
 packages/web/test-results/
 packages/web/playwright-report/
+downloads/
